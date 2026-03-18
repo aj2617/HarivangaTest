@@ -17,9 +17,9 @@ type InfoPageContent = {
 
 const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
   '/about': {
-    eyebrow: 'About MangoBD',
+    eyebrow: 'About Harivanga.com',
     title: 'Our Story',
-    intro: 'MangoBD connects customers directly with trusted orchards in Rajshahi and Chapainawabganj so fresh mangoes reach homes quickly and in peak condition.',
+    intro: 'Harivanga.com connects customers directly with trusted orchards in Rajshahi and Chapainawabganj so fresh mangoes reach homes quickly and in peak condition.',
     highlights: ['Direct orchard sourcing', 'Naturally ripened fruit', 'Reliable Dhaka delivery'],
     sections: [
       {
@@ -35,8 +35,8 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
   '/contact': {
     eyebrow: 'Support',
     title: 'Contact Us',
-    intro: 'Reach MangoBD for order updates, delivery coordination, or wholesale questions.',
-    highlights: ['Phone: +880 1712 345678', 'Email: hello@mangobd.com', 'Dhaka support team'],
+    intro: 'Reach Harivanga.com for order updates, delivery coordination, or wholesale questions.',
+    highlights: ['WhatsApp for Orders: +880 1307-367441', 'Email: hello@harivanga.com', 'Facebook: Jimbabu123'],
     sections: [
       {
         heading: 'Response time',
@@ -44,14 +44,14 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
       },
       {
         heading: 'Wholesale and partnerships',
-        body: 'For bulk orders or business collaborations, contact the team with expected quantity, location, and delivery timeline.'
+        body: 'For bulk orders or business collaborations, contact the team with expected quantity, location, and delivery timeline. Order requests can be sent to the WhatsApp number listed above.'
       }
     ]
   },
   '/shipping': {
     eyebrow: 'Policy',
     title: 'Shipping Policy',
-    intro: 'MangoBD prioritizes fast dispatch and careful handling so ripe fruit arrives in saleable condition.',
+    intro: 'Harivanga.com prioritizes fast dispatch and careful handling so ripe fruit arrives in saleable condition.',
     highlights: ['Same-day options in Dhaka', 'Scheduled delivery windows', 'Careful fruit handling'],
     sections: [
       {
@@ -67,7 +67,7 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
   '/returns': {
     eyebrow: 'Policy',
     title: 'Returns & Refunds',
-    intro: 'Fresh produce needs a practical return policy. MangoBD reviews quality issues quickly and resolves valid claims fairly.',
+    intro: 'Fresh produce needs a practical return policy. Harivanga.com reviews quality issues quickly and resolves valid claims fairly.',
     highlights: ['Report issues promptly', 'Photo evidence helps', 'Refunds depend on condition review'],
     sections: [
       {
@@ -76,7 +76,7 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
       },
       {
         heading: 'Resolution options',
-        body: 'Depending on the issue, MangoBD may offer replacement, partial refund, or account credit.'
+        body: 'Depending on the issue, Harivanga.com may offer replacement, partial refund, or account credit.'
       }
     ]
   },
@@ -99,7 +99,7 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
   '/privacy': {
     eyebrow: 'Policy',
     title: 'Privacy Policy',
-    intro: 'MangoBD stores only the customer information needed to manage accounts, deliveries, and order history.',
+    intro: 'Harivanga.com stores only the customer information needed to manage accounts, deliveries, and order history.',
     highlights: ['Order and address data', 'Firebase-backed auth', 'No unnecessary data collection'],
     sections: [
       {
@@ -161,7 +161,7 @@ export const InfoPage: React.FC = () => {
                 <MapPin size={20} />
               </div>
               <div>
-                <p className="text-sm font-bold text-mango-dark">MangoBD</p>
+                <p className="text-sm font-bold text-mango-dark">Harivanga.com</p>
                 <p className="text-sm text-gray-500 mt-1">House 12, Road 5, Dhanmondi, Dhaka, Bangladesh</p>
               </div>
             </div>

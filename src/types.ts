@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   description: string;
   image: string;
+  images?: string[];
   pricePerKg: number;
   stock: number;
   variety: string;
@@ -25,7 +26,7 @@ export interface OrderItem {
   price: number;
 }
 
-export type OrderStatus = 'Pending' | 'Confirmed' | 'Out for Delivery' | 'Delivered';
+export type OrderStatus = 'Pending' | 'Confirmed' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
 
 export interface Order {
   id: string;
@@ -33,6 +34,10 @@ export interface Order {
   customerPhone: string;
   deliveryAddress: string;
   deliveryArea: string;
+  deliveryDivision?: string;
+  deliveryDistrict?: string;
+  deliveryLocation?: string;
+  deliveryMethod?: 'Home Delivery' | 'Courier Pickup';
   deliveryDate: string;
   paymentMethod: 'bKash' | 'Nagad' | 'Cash on Delivery';
   items: OrderItem[];

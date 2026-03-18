@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Order } from '../types';
-import { DEMO_ORDERS, DEMO_ORDER_STORAGE_KEY, isLocalDemoMode } from '../data/mockData';
 import { CheckCircle, Package, Truck, MessageCircle, ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -15,25 +14,6 @@ export const OrderConfirmation: React.FC = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       if (!orderId) return;
-
-      if (isLocalDemoMode()) {
-        const localDemoOrderRaw = localStorage.getItem(DEMO_ORDER_STORAGE_KEY);
-        if (localDemoOrderRaw) {
-          const localDemoOrder = JSON.parse(localDemoOrderRaw) as Order;
-          if (localDemoOrder.id === orderId) {
-            setOrder(localDemoOrder);
-            setLoading(false);
-            return;
-          }
-        }
-
-        const mockOrder = DEMO_ORDERS.find(item => item.id === orderId);
-        if (mockOrder) {
-          setOrder(mockOrder);
-          setLoading(false);
-          return;
-        }
-      }
 
       const docRef = doc(db, 'orders', orderId);
       const docSnap = await getDoc(docRef);
@@ -143,7 +123,7 @@ export const OrderConfirmation: React.FC = () => {
                   </div>
                 </div>
                 <a 
-                  href={`https://wa.me/8801712345678?text=I have a question about my order #${order.id}`}
+                  href={`https://wa.me/8801307367441?text=I have a question about my order #${order.id}`}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-[#25D366] text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-[#25D366]/90 transition-all shadow-lg shadow-green-500/20"

@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Truck, Leaf, Home as HomeIcon, LayoutDashboard } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ProductCard } from '../components/ProductCard';
 import { MOCK_PRODUCTS } from '../data/mockData';
-import { useAuth } from '../context/AuthContext';
 
 export const Home: React.FC = () => {
   const featuredProducts = MOCK_PRODUCTS.slice(0, 4);
-  const { isAdmin } = useAuth();
 
   return (
     <div className="flex flex-col">
@@ -48,15 +46,6 @@ export const Home: React.FC = () => {
                 Shop Now
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="w-full sm:w-auto bg-white text-mango-dark px-6 sm:px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-xl"
-                >
-                  <LayoutDashboard size={20} />
-                  Admin Dashboard
-                </Link>
-              )}
               <Link
                 to="/about"
                 className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-6 sm:px-8 py-4 rounded-2xl font-bold transition-all text-center"
@@ -147,7 +136,7 @@ export const Home: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-4xl font-black mb-8 leading-tight">
-                Why MangoBD is the <span className="text-mango-yellow">Trusted Choice</span> for Thousands
+                Why Harivanga.com is the <span className="text-mango-yellow">Trusted Choice</span> for Thousands
               </h2>
               <div className="space-y-8">
                 <div className="flex gap-6">

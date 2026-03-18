@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth, db, handleFirestoreError, OperationType } from '../firebase';
+import { auth, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { Order } from '../types';
-import { DEMO_ORDERS, DEMO_PROFILE, isLocalDemoMode } from '../data/mockData';
 import { User, Package, MapPin, Phone, LogOut, ChevronRight, Clock, CheckCircle2, Truck, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { format } from 'date-fns';
@@ -14,20 +13,18 @@ export const Account: React.FC = () => {
   const { user, profile, loading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const isDemoMode = isLocalDemoMode() && !user;
-  const activeProfile = isDemoMode ? DEMO_PROFILE : profile;
-  const activeName = isDemoMode ? DEMO_PROFILE.name : user?.displayName || 'Mango Lover';
-  const activeEmailOrPhone = isDemoMode ? DEMO_PROFILE.email || DEMO_PROFILE.phone : user?.email || user?.phoneNumber;
+  const activeProfile = profile;
+  const activeName = user?.displayName || profile?.name || 'Harivanga Customer';
+  const activeEmailOrPhone = user?.email || user?.phoneNumber || profile?.phone;
 
   useEffect(() => {
-    if (isDemoMode) {
-      setOrders(DEMO_ORDERS.filter(order => order.userId === DEMO_PROFILE.uid));
+    if (!user) {
+      setOrders([]);
       setOrdersLoading(false);
       return;
     }
-
-    if (!user) return;
 
     const q = query(
       collection(db, 'orders'),
@@ -40,18 +37,24 @@ export const Account: React.FC = () => {
       setOrders(ordersData);
       setOrdersLoading(false);
     }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'orders');
+      console.error('Failed to load account orders', error);
+      setOrders([]);
+      setOrdersLoading(false);
     });
 
     return unsubscribe;
-  }, [isDemoMode, user]);
+  }, [user]);
 
   const handleGoogleLogin = async () => {
     try {
+      setLoginError(null);
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error('Login error:', error);
+      const message = error instanceof Error ? error.message : 'Google sign-in failed. Please try again.';
+      setLoginError(message);
     }
   };
 
@@ -63,7 +66,7 @@ export const Account: React.FC = () => {
     );
   }
 
-  if (!user && !isDemoMode) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
@@ -76,12 +79,11 @@ export const Account: React.FC = () => {
           </div>
           <h2 className="text-3xl font-black text-mango-dark mb-4">Welcome Back</h2>
           <p className="text-gray-500 mb-10">Login to track your orders, save addresses, and enjoy a faster checkout experience.</p>
-          {isLocalDemoMode() && (
-            <p className="text-xs text-mango-orange font-bold mb-6">
-              Local demo mode is available on localhost. Open the account page after enabling the local app to preview sample orders.
-            </p>
+          {loginError && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {loginError}
+            </div>
           )}
-          
           <button
             onClick={handleGoogleLogin}
             className="w-full bg-white border-2 border-gray-100 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition-all mb-4"
@@ -110,18 +112,12 @@ export const Account: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-mango-dark mb-1">{activeName}</h3>
               <p className="text-sm text-gray-400 mb-6">{activeEmailOrPhone}</p>
-              {isDemoMode ? (
-                <div className="w-full py-3 rounded-xl border border-mango-orange/20 bg-mango-orange/5 text-sm font-bold text-mango-orange">
-                  Local Demo Account
-                </div>
-              ) : (
-                <button 
-                  onClick={() => auth.signOut()}
-                  className="w-full py-3 rounded-xl border border-gray-100 text-sm font-bold text-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-2"
-                >
-                  <LogOut size={16} /> Sign Out
-                </button>
-              )}
+              <button 
+                onClick={() => auth.signOut()}
+                className="w-full py-3 rounded-xl border border-gray-100 text-sm font-bold text-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+              >
+                <LogOut size={16} /> Sign Out
+              </button>
             </div>
 
             <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 space-y-1">

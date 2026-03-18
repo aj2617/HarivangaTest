@@ -5,10 +5,16 @@ import { auth, db } from '../firebase';
 import { UserProfile } from '../types';
 
 const ADMIN_EMAIL = 'ashadujjaman2617@gmail.com';
-const DEV_ADMIN_HOSTS = new Set(['localhost', '127.0.0.1']);
 
-function isLocalDevAdminBypassEnabled() {
-  return DEV_ADMIN_HOSTS.has(window.location.hostname);
+function buildFallbackProfile(firebaseUser: User, role: UserProfile['role']): UserProfile {
+  return {
+    uid: firebaseUser.uid,
+    name: firebaseUser.displayName || '',
+    phone: firebaseUser.phoneNumber || '',
+    email: firebaseUser.email || undefined,
+    role,
+    savedAddresses: [],
+  };
 }
 
 interface AuthContextType {
@@ -32,8 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(firebaseUser);
         if (firebaseUser) {
           const docRef = doc(db, 'users', firebaseUser.uid);
-          const docSnap = await getDoc(docRef);
           const isAdminEmail = firebaseUser.email === ADMIN_EMAIL;
+          const fallbackProfile = buildFallbackProfile(firebaseUser, isAdminEmail ? 'admin' : 'customer');
+          const docSnap = await getDoc(docRef);
 
           if (docSnap.exists()) {
             const existingProfile = docSnap.data() as UserProfile;
@@ -43,18 +50,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               await setDoc(docRef, adminProfile, { merge: true });
               setProfile(adminProfile);
             } else {
-              setProfile(existingProfile);
+              setProfile({ ...fallbackProfile, ...existingProfile });
             }
           } else {
             // Create default profile for new users.
-            const newProfile: UserProfile = {
-              uid: firebaseUser.uid,
-              name: firebaseUser.displayName || '',
-              phone: firebaseUser.phoneNumber || '',
-              email: firebaseUser.email || undefined,
-              role: isAdminEmail ? 'admin' : 'customer',
-              savedAddresses: []
-            };
+            const newProfile: UserProfile = fallbackProfile;
             await setDoc(docRef, newProfile);
             setProfile(newProfile);
           }
@@ -63,7 +63,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (error) {
         console.error('Failed to initialize auth state', error);
-        setProfile(null);
+        if (firebaseUser) {
+          const isAdminEmail = firebaseUser.email === ADMIN_EMAIL;
+          setProfile(buildFallbackProfile(firebaseUser, isAdminEmail ? 'admin' : 'customer'));
+        } else {
+          setProfile(null);
+        }
       } finally {
         setLoading(false);
       }
@@ -72,10 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const isAdmin =
-    isLocalDevAdminBypassEnabled() ||
-    profile?.role === 'admin' ||
-    user?.email === ADMIN_EMAIL;
+  const isAdmin = profile?.role === 'admin' || user?.email === ADMIN_EMAIL;
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, isAdmin }}>

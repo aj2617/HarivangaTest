@@ -1,35 +1,64 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { DEMO_ORDER_STORAGE_KEY, DEMO_PROFILE, isLocalDemoMode } from '../data/mockData';
-import { CheckCircle2, CreditCard, Truck, MapPin, Phone, User as UserIcon, Calendar } from 'lucide-react';
+import { CheckCircle2, CreditCard, Truck, MapPin, Phone, User as UserIcon, Calendar, Building2, LocateFixed } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Order } from '../types';
+
+const DISTRICTS_BY_DIVISION: Record<string, string[]> = {
+  Barishal: ['Barguna', 'Barishal', 'Bhola', 'Jhalokathi', 'Patuakhali', 'Pirojpur'],
+  Chattogram: ['Bandarban', 'Brahmanbaria', 'Chandpur', 'Chattogram', 'Cumilla', "Cox's Bazar", 'Feni', 'Khagrachhari', 'Lakshmipur', 'Noakhali', 'Rangamati'],
+  Dhaka: ['Dhaka', 'Faridpur', 'Gazipur', 'Gopalganj', 'Kishoreganj', 'Madaripur', 'Manikganj', 'Munshiganj', 'Narayanganj', 'Narsingdi', 'Rajbari', 'Shariatpur', 'Tangail'],
+  Khulna: ['Bagerhat', 'Chuadanga', 'Jashore', 'Jhenaidah', 'Khulna', 'Kushtia', 'Magura', 'Meherpur', 'Narail', 'Satkhira'],
+  Mymensingh: ['Jamalpur', 'Mymensingh', 'Netrokona', 'Sherpur'],
+  Rajshahi: ['Bogura', 'Joypurhat', 'Naogaon', 'Natore', 'Chapai Nawabganj', 'Pabna', 'Rajshahi', 'Sirajganj'],
+  Rangpur: ['Dinajpur', 'Gaibandha', 'Kurigram', 'Lalmonirhat', 'Nilphamari', 'Panchagarh', 'Rangpur', 'Thakurgaon'],
+  Sylhet: ['Habiganj', 'Moulvibazar', 'Sunamganj', 'Sylhet'],
+};
+
+type DeliveryMethod = 'Home Delivery' | 'Courier Pickup';
 
 export const Checkout: React.FC = () => {
   const { cart, subtotal, clearCart } = useCart();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const deliveryCharge = 60;
-  const isDemoMode = isLocalDemoMode() && !user;
-  
+
   const [formData, setFormData] = useState({
-    name: profile?.name || DEMO_PROFILE.name,
-    phone: profile?.phone || DEMO_PROFILE.phone,
-    address: profile?.savedAddresses[0] || DEMO_PROFILE.savedAddresses[0] || '',
-    area: 'Dhaka - Dhanmondi',
+    name: profile?.name || '',
+    phone: profile?.phone || '',
+    address: profile?.savedAddresses[0] || '',
+    division: 'Dhaka',
+    district: 'Dhaka',
+    deliveryMethod: 'Home Delivery' as DeliveryMethod,
     deliveryDate: new Date().toISOString().split('T')[0],
-    paymentMethod: 'Cash on Delivery' as 'bKash' | 'Nagad' | 'Cash on Delivery'
+    paymentMethod: 'Cash on Delivery' as 'bKash' | 'Nagad' | 'Cash on Delivery',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const divisionOptions = Object.keys(DISTRICTS_BY_DIVISION);
+  const districtOptions = DISTRICTS_BY_DIVISION[formData.division];
+  const deliveryCharge = formData.deliveryMethod === 'Home Delivery' ? 60 : 120;
+
+  const deliveryAreaLabel = useMemo(
+    () => `${formData.division} / ${formData.district} / ${formData.deliveryMethod}`,
+    [formData.division, formData.district, formData.deliveryMethod]
+  );
+
+  const handleDivisionChange = (division: string) => {
+    const nextDistrict = DISTRICTS_BY_DIVISION[division][0];
+    setFormData((current) => ({
+      ...current,
+      division,
+      district: nextDistrict,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user && !isDemoMode) {
+    if (!user) {
       alert('Please login to place an order');
       navigate('/account');
       return;
@@ -37,58 +66,34 @@ export const Checkout: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      if (isDemoMode) {
-        const demoOrder: Order = {
-          id: `demo-live-${Date.now()}`,
-          userId: DEMO_PROFILE.uid,
-          customerName: formData.name,
-          customerPhone: formData.phone,
-          deliveryAddress: formData.address,
-          deliveryArea: formData.area,
-          deliveryDate: formData.deliveryDate,
-          paymentMethod: formData.paymentMethod,
-          items: cart.map(item => ({
-            productId: item.productId,
-            productName: item.productName,
-            quantity: item.quantity,
-            variant: item.variant,
-            price: item.price
-          })),
-          subtotal,
-          deliveryCharge,
-          total: subtotal + deliveryCharge,
-          status: 'Pending',
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem(DEMO_ORDER_STORAGE_KEY, JSON.stringify(demoOrder));
-        clearCart();
-        navigate(`/order-confirmation/${demoOrder.id}`);
-        return;
-      }
-
-      const orderData = {
-        userId: user.uid,
+      const orderBase = {
         customerName: formData.name,
         customerPhone: formData.phone,
         deliveryAddress: formData.address,
-        deliveryArea: formData.area,
+        deliveryArea: deliveryAreaLabel,
+        deliveryDivision: formData.division,
+        deliveryDistrict: formData.district,
+        deliveryMethod: formData.deliveryMethod,
         deliveryDate: formData.deliveryDate,
         paymentMethod: formData.paymentMethod,
-        items: cart.map(item => ({
+        items: cart.map((item) => ({
           productId: item.productId,
           productName: item.productName,
           quantity: item.quantity,
           variant: item.variant,
-          price: item.price
+          price: item.price,
         })),
         subtotal,
         deliveryCharge,
         total: subtotal + deliveryCharge,
-        status: 'Pending',
-        createdAt: new Date().toISOString()
+        status: 'Pending' as const,
+        createdAt: new Date().toISOString(),
       };
 
-      const docRef = await addDoc(collection(db, 'orders'), orderData);
+      const docRef = await addDoc(collection(db, 'orders'), {
+        userId: user.uid,
+        ...orderBase,
+      });
       clearCart();
       navigate(`/order-confirmation/${docRef.id}`);
     } catch (error) {
@@ -102,7 +107,6 @@ export const Checkout: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Checkout Form */}
           <div className="lg:col-span-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -115,11 +119,6 @@ export const Checkout: React.FC = () => {
                 </div>
                 Delivery Details
               </h2>
-              {isDemoMode && (
-                <div className="mb-6 rounded-2xl border border-mango-orange/20 bg-mango-orange/5 px-4 py-3 text-sm text-mango-orange">
-                  Local demo mode: placing an order here creates a browser-only sample order for UI testing.
-                </div>
-              )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -151,38 +150,96 @@ export const Checkout: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                    <MapPin size={14} /> Full Delivery Address
-                  </label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20 focus:border-mango-orange transition-all resize-none"
-                    placeholder="House, Road, Area, Landmark..."
-                  />
+                <div className="rounded-3xl border border-gray-100 bg-gray-50/70 p-5 sm:p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 bg-mango-orange/10 text-mango-orange rounded-xl flex items-center justify-center">
+                      <LocateFixed size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-mango-dark">Delivery Location</h3>
+                      <p className="text-sm text-gray-500">Select division and district before choosing delivery method.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                        <Building2 size={14} /> Division
+                      </label>
+                      <select
+                        value={formData.division}
+                        onChange={(e) => handleDivisionChange(e.target.value)}
+                        className="w-full px-4 py-3 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20"
+                      >
+                        {divisionOptions.map((division) => (
+                          <option key={division} value={division}>
+                            {division}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                        <MapPin size={14} /> District
+                      </label>
+                      <select
+                        value={formData.district}
+                        onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                        className="w-full px-4 py-3 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20"
+                      >
+                        {districtOptions.map((district) => (
+                          <option key={district} value={district}>
+                            {district}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                      <MapPin size={14} /> Full Delivery Address
+                    </label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      className="w-full px-4 py-3 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20 focus:border-mango-orange transition-all resize-none"
+                      placeholder="House, Road, Area, Landmark..."
+                    />
+                  </div>
+
+                  <div className="mt-5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2 mb-3">
+                      <Truck size={14} /> Delivery Method
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {(['Home Delivery', 'Courier Pickup'] as const).map((method) => (
+                        <button
+                          key={method}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, deliveryMethod: method })}
+                          className={`rounded-2xl border-2 px-4 py-4 text-left transition-all ${
+                            formData.deliveryMethod === method
+                              ? 'border-mango-orange bg-mango-orange/5 shadow-md'
+                              : 'border-gray-200 bg-white'
+                          }`}
+                        >
+                          <p className="font-black text-mango-dark">{method}</p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            {method === 'Home Delivery'
+                              ? 'Delivered to the exact address selected above.'
+                              : 'Pickup from courier point in the selected district.'}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                      <MapPin size={14} /> Delivery Area
-                    </label>
-                    <select
-                      value={formData.area}
-                      onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20 focus:border-mango-orange transition-all"
-                    >
-                      <option>Dhaka - Dhanmondi</option>
-                      <option>Dhaka - Gulshan</option>
-                      <option>Dhaka - Banani</option>
-                      <option>Dhaka - Uttara</option>
-                      <option>Dhaka - Mirpur</option>
-                      <option>Outside Dhaka</option>
-                    </select>
-                  </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
                       <Calendar size={14} /> Preferred Delivery Date
@@ -195,6 +252,13 @@ export const Checkout: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })}
                       className="w-full px-4 py-3 bg-gray-50 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20 focus:border-mango-orange transition-all"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Selected Delivery Route</label>
+                    <div className="w-full px-4 py-3 bg-gray-50 rounded-2xl border border-gray-200 text-sm font-semibold text-mango-dark">
+                      {deliveryAreaLabel}
+                    </div>
                   </div>
                 </div>
 
@@ -235,7 +299,6 @@ export const Checkout: React.FC = () => {
             </motion.div>
           </div>
 
-          {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 sticky top-24">
               <h3 className="text-xl font-bold mb-6">Order Summary</h3>
@@ -248,12 +311,19 @@ export const Checkout: React.FC = () => {
                       </div>
                       <div>
                         <p className="font-bold text-mango-dark">{item.productName}</p>
-                        <p className="text-[10px] text-gray-400">{item.quantity} x {item.variant}</p>
+                        <p className="text-[10px] text-gray-400">
+                          {item.quantity} x {item.variant}
+                        </p>
                       </div>
                     </div>
                     <span className="font-bold">৳{item.price * item.quantity}</span>
                   </div>
                 ))}
+              </div>
+
+              <div className="rounded-2xl bg-gray-50 px-4 py-4 mb-6">
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Delivery Destination</p>
+                <p className="mt-2 text-sm font-bold text-mango-dark">{deliveryAreaLabel}</p>
               </div>
 
               <div className="space-y-3 pt-6 border-t border-gray-100">
@@ -262,7 +332,7 @@ export const Checkout: React.FC = () => {
                   <span className="font-bold text-mango-dark">৳{subtotal}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
-                  <span>Delivery Charge</span>
+                  <span>{formData.deliveryMethod}</span>
                   <span className="font-bold text-mango-dark">৳{deliveryCharge}</span>
                 </div>
                 <div className="pt-4 flex justify-between items-center">
