@@ -24,4 +24,4 @@ Add the same Firebase environment variables you use locally in the Cloudflare Pa
 ### Notes
 
 - The app uses `HashRouter`, so no SPA rewrite rule is needed.
-- `wrangler.toml` is included for Cloudflare-compatible project config.
+- For a Git-connected Cloudflare Pages project, do not add a custom deploy command.
