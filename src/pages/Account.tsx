@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth, db } from '../firebase';
+import { auth, db, getAuthErrorMessage, signInWithGoogle } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { Order } from '../types';
-import { User, Package, MapPin, Phone, LogOut, ChevronRight, Clock, CheckCircle2, Truck, AlertCircle } from 'lucide-react';
+import { User, Package, MapPin, LogOut, ChevronRight, Clock, CheckCircle2, Truck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { format } from 'date-fns';
 
@@ -48,13 +47,10 @@ export const Account: React.FC = () => {
   const handleGoogleLogin = async () => {
     try {
       setLoginError(null);
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(auth, provider);
+      await signInWithGoogle();
     } catch (error) {
       console.error('Login error:', error);
-      const message = error instanceof Error ? error.message : 'Google sign-in failed. Please try again.';
-      setLoginError(message);
+      setLoginError(getAuthErrorMessage(error));
     }
   };
 
