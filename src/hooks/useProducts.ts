@@ -119,13 +119,18 @@ export function useProducts() {
 
     let cancelled = false;
     let channel: ReturnType<typeof supabase.channel> | null = null;
+    let idleHandle:
+      | { type: 'idle'; id: number }
+      | { type: 'timeout'; id: number }
+      | null = null;
     const handleStorefrontRefresh = () => {
       void loadProducts();
     };
     win?.addEventListener(STOREFRONT_PRODUCTS_CHANGED_EVENT, handleStorefrontRefresh);
-    const idleCallback =
-      win && 'requestIdleCallback' in win
-        ? win.requestIdleCallback(
+    if (win && 'requestIdleCallback' in win) {
+      idleHandle = {
+        type: 'idle',
+        id: win.requestIdleCallback(
             () => {
               if (cancelled) return;
               channel = supabase
@@ -136,23 +141,29 @@ export function useProducts() {
                 .subscribe();
             },
             { timeout: 2000 }
-          )
-        : win?.setTimeout(() => {
+          ),
+      };
+    } else if (win) {
+      idleHandle = {
+        type: 'timeout',
+        id: win.setTimeout(() => {
             if (cancelled) return;
             channel = supabase
               .channel('storefront-products')
               .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
                 void loadProducts();
-              })
-              .subscribe();
-          }, 1200);
+                })
+                .subscribe();
+          }, 1200),
+      };
+    }
 
     return () => {
       cancelled = true;
-      if (typeof idleCallback === 'number') {
-        win?.clearTimeout(idleCallback);
-      } else if (win && 'cancelIdleCallback' in win && idleCallback !== undefined) {
-        win.cancelIdleCallback(idleCallback);
+      if (idleHandle?.type === 'timeout') {
+        win?.clearTimeout(idleHandle.id);
+      } else if (idleHandle?.type === 'idle' && win && 'cancelIdleCallback' in win) {
+        win.cancelIdleCallback(idleHandle.id);
       }
 
       if (channel) {

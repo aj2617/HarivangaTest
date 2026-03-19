@@ -62,6 +62,10 @@ export function getAuthErrorMessage(error: unknown) {
 }
 
 export async function signInWithGoogle() {
+  if (!hasSupabaseConfig) {
+    throw new Error('Supabase environment variables are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+  }
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {

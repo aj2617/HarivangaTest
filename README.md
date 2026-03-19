@@ -4,7 +4,7 @@
 
 1. Install dependencies:
    `npm install`
-2. Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and optional `GEMINI_API_KEY` values in `.env.local`
+2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` values in `.env.local`
 3. In Supabase SQL Editor, run [supabase/schema.sql](/c:/Users/Lenovo/Desktop/MangoBD/supabase/schema.sql)
 4. Run the app:
    `npm run dev`

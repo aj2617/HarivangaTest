@@ -5,6 +5,7 @@ import { Seo } from '../components/Seo';
 import { getLocalDevOrderById } from '../lib/localDevOrders';
 import { formatCurrency } from '../lib/format';
 import { getRecentOrderById } from '../lib/recentOrders';
+import { hasSupabaseConfig } from '../lib/env';
 import { Order } from '../types';
 import { CheckCircle, Package, Truck, MessageCircle, ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -37,6 +38,11 @@ export const OrderConfirmation: React.FC = () => {
       }
 
       if (!user && !isAdmin) {
+        setLoading(false);
+        return;
+      }
+
+      if (!hasSupabaseConfig) {
         setLoading(false);
         return;
       }

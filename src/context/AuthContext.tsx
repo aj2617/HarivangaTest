@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { auth, mapUserProfileRow, mapUserProfileToRow, supabase } from '../supabase';
+import { hasSupabaseConfig } from '../lib/env';
 import { UserProfile } from '../types';
 
 function buildFallbackProfile(authUser: User, role: UserProfile['role']): UserProfile {
@@ -31,6 +32,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let isMounted = true;
+
+    if (!hasSupabaseConfig) {
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
 
     const syncAuthState = async (authUser: User | null) => {
       setLoading(true);
