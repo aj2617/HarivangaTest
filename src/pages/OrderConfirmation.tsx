@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { mapOrderRow, supabase } from '../supabase';
 import { Seo } from '../components/Seo';
 import { getLocalDevOrderById } from '../lib/localDevOrders';
+import { formatCurrency } from '../lib/format';
 import { Order } from '../types';
 import { CheckCircle, Package, Truck, MessageCircle, ArrowRight, Calendar, MapPin } from 'lucide-react';
 
@@ -115,12 +116,12 @@ export const OrderConfirmation: React.FC = () => {
                   {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between text-sm">
                       <span className="text-gray-500">{item.quantity} x {item.productName} ({item.variant})</span>
-                      <span className="font-bold">৳{item.price * item.quantity}</span>
+                      <span className="font-bold">{formatCurrency(item.price * item.quantity)}</span>
                     </div>
                   ))}
                   <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                     <span className="font-bold">Total Paid</span>
-                    <span className="text-xl font-black text-mango-orange">৳{order.total}</span>
+                    <span className="text-xl font-black text-mango-orange">{formatCurrency(order.total)}</span>
                   </div>
                 </div>
               </div>

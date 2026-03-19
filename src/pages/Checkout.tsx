@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { handleDatabaseError, mapOrderToRow, OperationType, supabase } from '../supabase';
+import { mapOrderToRow, supabase } from '../supabase';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Seo } from '../components/Seo';
 import { canUseLocalOrderFallback, saveLocalDevOrder } from '../lib/localDevOrders';
 import { CheckCircle2, CreditCard, Truck, MapPin, Phone, User as UserIcon, Building2, LocateFixed } from 'lucide-react';
+import { formatCurrency } from '../lib/format';
 
 const DISTRICTS_BY_DIVISION: Record<string, string[]> = {
   Barishal: ['Barguna', 'Barishal', 'Bhola', 'Jhalokathi', 'Patuakhali', 'Pirojpur'],
@@ -39,6 +40,17 @@ export const Checkout: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    setFormData((current) => ({
+      ...current,
+      name: current.name || profile.name || '',
+      phone: current.phone || profile.phone || '',
+      address: current.address || profile.savedAddresses[0] || '',
+    }));
+  }, [profile]);
 
   const divisionOptions = Object.keys(DISTRICTS_BY_DIVISION);
   const districtOptions = DISTRICTS_BY_DIVISION[formData.division];
@@ -338,7 +350,7 @@ export const Checkout: React.FC = () => {
                   disabled={isSubmitting || cart.length === 0}
                   className="w-full mt-12 bg-mango-orange text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-mango-orange/20 hover:bg-mango-orange/90 transition-all disabled:bg-gray-200 disabled:shadow-none"
                 >
-                  {isSubmitting ? 'Processing Order...' : `Place Order - ৳${subtotal + deliveryCharge}`}
+                  {isSubmitting ? 'Processing Order...' : `Place Order - ${formatCurrency(subtotal + deliveryCharge)}`}
                 </button>
                 {submitError && (
                   <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -366,7 +378,7 @@ export const Checkout: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="font-bold">৳{item.price * item.quantity}</span>
+                    <span className="font-bold">{formatCurrency(item.price * item.quantity)}</span>
                   </div>
                 ))}
               </div>
@@ -379,15 +391,15 @@ export const Checkout: React.FC = () => {
               <div className="space-y-3 pt-6 border-t border-gray-100">
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>Subtotal</span>
-                  <span className="font-bold text-mango-dark">৳{subtotal}</span>
+                  <span className="font-bold text-mango-dark">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>{formData.deliveryMethod}</span>
-                  <span className="font-bold text-mango-dark">৳{deliveryCharge}</span>
+                  <span className="font-bold text-mango-dark">{formatCurrency(deliveryCharge)}</span>
                 </div>
                 <div className="pt-4 flex justify-between items-center">
                   <span className="text-lg font-bold">Total</span>
-                  <span className="text-2xl font-black text-mango-orange">৳{subtotal + deliveryCharge}</span>
+                  <span className="text-2xl font-black text-mango-orange">{formatCurrency(subtotal + deliveryCharge)}</span>
                 </div>
               </div>
 

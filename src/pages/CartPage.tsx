@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Seo } from '../components/Seo';
+import { formatCurrency } from '../lib/format';
 
 export const CartPage: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, subtotal, totalItems } = useCart();
@@ -76,7 +77,7 @@ export const CartPage: React.FC = () => {
                         <Plus size={14} />
                       </button>
                     </div>
-                    <span className="font-bold text-mango-dark">৳{item.price * item.quantity}</span>
+                    <span className="font-bold text-mango-dark">{formatCurrency(item.price * item.quantity)}</span>
                   </div>
                 </div>
               </div>
@@ -91,15 +92,15 @@ export const CartPage: React.FC = () => {
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-500">
                   <span>Subtotal</span>
-                  <span className="font-bold text-mango-dark">৳{subtotal}</span>
+                  <span className="font-bold text-mango-dark">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Delivery Charge</span>
-                  <span className="font-bold text-mango-dark">৳{deliveryCharge}</span>
+                  <span className="font-bold text-mango-dark">{formatCurrency(deliveryCharge)}</span>
                 </div>
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                   <span className="text-lg font-bold">Total</span>
-                  <span className="text-2xl font-black text-mango-orange">৳{subtotal + deliveryCharge}</span>
+                  <span className="text-2xl font-black text-mango-orange">{formatCurrency(subtotal + deliveryCharge)}</span>
                 </div>
               </div>
 

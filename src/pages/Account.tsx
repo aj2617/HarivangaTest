@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { mapOrderRow, supabase } from '../supabase';
 import { Seo } from '../components/Seo';
 import { canUseLocalOrderFallback, findLocalDevOrdersByPhone } from '../lib/localDevOrders';
+import { formatCurrency } from '../lib/format';
 import { Order } from '../types';
 import { Search, Package, Clock, CheckCircle2, Truck, Phone } from 'lucide-react';
 import { format } from 'date-fns';
@@ -46,20 +47,19 @@ export const Account: React.FC = () => {
         return;
       }
 
-      const snapshots = await Promise.all([
-        supabase.from('orders').select('*').eq('customer_phone_normalized', normalizedPhone),
-        supabase.from('orders').select('*').eq('customer_phone_normalized', normalizedPhone),
-      ]);
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('customer_phone_normalized', normalizedPhone)
+        .order('created_at', { ascending: false });
 
-      snapshots.forEach(({ data, error }) => {
-        if (error) {
-          throw error;
-        }
+      if (error) {
+        throw error;
+      }
 
-        (data ?? []).forEach((row) => {
-          const order = mapOrderRow(row);
-          orderMap.set(order.id, order);
-        });
+      (data ?? []).forEach((row) => {
+        const order = mapOrderRow(row);
+        orderMap.set(order.id, order);
       });
 
       const matchedOrders = Array.from(orderMap.values()).sort(
@@ -168,7 +168,7 @@ export const Account: React.FC = () => {
                         <div className="flex items-center gap-6">
                           <div>
                             <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Total Amount</p>
-                            <p className="font-black text-lg text-mango-dark">৳{order.total}</p>
+                            <p className="font-black text-lg text-mango-dark">{formatCurrency(order.total)}</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Payment</p>

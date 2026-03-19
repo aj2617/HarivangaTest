@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, MapPin } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
+import { formatCurrency } from '../lib/format';
 
 interface ProductCardProps {
   product: Product;
@@ -70,7 +71,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs text-gray-400 block">Starting from</span>
-            <span className="text-xl font-bold text-mango-dark">৳{product.pricePerKg}</span>
+            <span className="text-xl font-bold text-mango-dark">{formatCurrency(product.pricePerKg)}</span>
             <span className="text-xs text-gray-400 ml-1">/kg</span>
           </div>
 

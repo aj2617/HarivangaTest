@@ -16,6 +16,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { Seo } from '../components/Seo';
 import { useProducts } from '../hooks/useProducts';
+import { formatCurrency } from '../lib/format';
 
 export const ProductDetail: React.FC = () => {
   const { id } = useParams();
@@ -83,7 +84,7 @@ export const ProductDetail: React.FC = () => {
   };
 
   const handleWhatsAppOrder = () => {
-    const message = `Hello! I'd like to order ${quantity} x ${product.name} (${selectedVariant?.weight}). Total: ৳${totalPrice}`;
+    const message = `Hello! I'd like to order ${quantity} x ${product.name} (${selectedVariant?.weight}). Total: ${formatCurrency(totalPrice)}`;
     window.open(`https://wa.me/8801307367441?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -93,7 +94,7 @@ export const ProductDetail: React.FC = () => {
         title={product ? `${product.name} - ${product.variety}` : 'Product Details'}
         description={
           product
-            ? `${product.description} Origin: ${product.origin}. Taste profile: ${product.tasteProfile}. Starting from ৳${product.pricePerKg}/kg.`
+            ? `${product.description} Origin: ${product.origin}. Taste profile: ${product.tasteProfile}. Starting from ${formatCurrency(product.pricePerKg)}/kg.`
             : 'Explore authentic Harivanga and premium mango details, pricing, and delivery options.'
         }
         path={product ? `/product/${product.id}` : `/product/${id ?? ''}`}
@@ -233,7 +234,7 @@ export const ProductDetail: React.FC = () => {
                         : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'
                     }`}
                   >
-                    {v.weight} - ৳{v.price}
+                    {v.weight} - {formatCurrency(v.price)}
                   </button>
                 ))}
               </div>
@@ -260,7 +261,7 @@ export const ProductDetail: React.FC = () => {
                   className="w-full bg-mango-dark hover:bg-mango-dark/90 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-mango-dark/10 disabled:bg-gray-200 disabled:shadow-none"
                 >
                   <Zap size={20} />
-                  Buy Now - ৳{totalPrice}
+                  Buy Now - {formatCurrency(totalPrice)}
                 </button>
                 <button
                   onClick={handleAddToCart}
@@ -268,7 +269,7 @@ export const ProductDetail: React.FC = () => {
                   className="w-full bg-mango-orange hover:bg-mango-orange/90 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-mango-orange/20 disabled:bg-gray-200 disabled:shadow-none"
                 >
                   <ShoppingCart size={20} />
-                  Add to Cart - ৳{totalPrice}
+                  Add to Cart - {formatCurrency(totalPrice)}
                 </button>
               </div>
             </div>
