@@ -14,27 +14,71 @@ import {
   Zap,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { fetchStorefrontProductById } from '../lib/publicProducts';
 import { useProducts } from '../hooks/useProducts';
 import { formatCurrency } from '../lib/format';
+import { Product } from '../types';
 
 export const ProductDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart, replaceCart } = useCart();
   const { products, loading } = useProducts();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [productLoading, setProductLoading] = useState(true);
 
-  const product = products.find((p) => p.id === id);
   const [selectedVariant, setSelectedVariant] = useState(product?.variants[0] || null);
   const [selectedImage, setSelectedImage] = useState(product?.image || product?.images?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const galleryImages = product ? [product.image, ...(product.images ?? []).filter((image) => image !== product.image)] : [];
 
   useEffect(() => {
+    if (!id) {
+      setProduct(null);
+      setProductLoading(false);
+      return;
+    }
+
+    const summaryProduct = products.find((entry) => entry.id === id) ?? null;
+    if (summaryProduct) {
+      setProduct(summaryProduct);
+    }
+
+    const controller = new AbortController();
+    setProductLoading(true);
+
+    void fetchStorefrontProductById(id, controller.signal)
+      .then((fetchedProduct) => {
+        if (fetchedProduct) {
+          setProduct(fetchedProduct);
+        } else if (!summaryProduct) {
+          setProduct(null);
+        }
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        console.error('Failed to load product detail', error);
+        if (!summaryProduct) {
+          setProduct(null);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setProductLoading(false);
+        }
+      });
+
+    return () => controller.abort();
+  }, [id, products]);
+
+  useEffect(() => {
     setSelectedVariant(product?.variants[0] || null);
     setSelectedImage(product?.image || product?.images?.[0] || '');
   }, [product]);
 
-  if (loading) {
+  if (loading || productLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mango-orange"></div>
@@ -169,7 +213,7 @@ export const ProductDetail: React.FC = () => {
 
             <p className="text-gray-500 text-lg leading-relaxed mb-8">{product.description}</p>
 
-            <div className="grid grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-2 gap-6 mb-10 [content-visibility:auto] [contain-intrinsic-size:1px_220px]">
               <div className="p-4 bg-mango-yellow/5 rounded-2xl border border-mango-yellow/10">
                 <span className="text-xs text-gray-400 block mb-1">Taste Profile</span>
                 <span className="font-bold text-sm">{product.tasteProfile}</span>
@@ -180,7 +224,7 @@ export const ProductDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="mb-10">
+            <div className="mb-10 [content-visibility:auto] [contain-intrinsic-size:1px_200px]">
               <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Select Weight</h3>
               <div className="flex flex-wrap gap-3">
                 {product.variants.map((v) => (
@@ -241,7 +285,7 @@ export const ProductDetail: React.FC = () => {
               Order via WhatsApp
             </button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 border-t border-gray-100">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 border-t border-gray-100 [content-visibility:auto] [contain-intrinsic-size:1px_220px]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                   <Leaf size={20} />

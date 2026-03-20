@@ -154,7 +154,7 @@ export const InfoPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 [content-visibility:auto] [contain-intrinsic-size:1px_1800px]">
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-8">
           <div className="space-y-6">
             {page.sections.map((section, index) => {

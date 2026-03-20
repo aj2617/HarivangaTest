@@ -4,74 +4,14 @@ import {
   isLocalDevAdminMode,
   LOCAL_DEV_PRODUCTS_UPDATED_EVENT,
 } from '../lib/localDevProducts';
+import { fetchStorefrontProducts } from '../lib/publicProducts';
 import { STOREFRONT_PRODUCTS_CACHE_KEY, STOREFRONT_PRODUCTS_CHANGED_EVENT } from '../lib/storefrontSync';
 import { hasSupabaseConfig } from '../lib/env';
 import { Product } from '../types';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
-type ProductVariant = {
-  weight: string;
-  price: number;
-};
-
-type ProductRow = {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  images: string[] | null;
-  price_per_kg: number;
-  stock: number;
-  variety: string;
-  origin: string;
-  taste_profile: string;
-  is_available: boolean;
-  variants: ProductVariant[] | null;
-};
-
 let memoryCache: { products: Product[]; timestamp: number } | null = null;
-
-function mapProductRow(row: ProductRow): Product {
-  return {
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    image: row.image,
-    images: row.images ?? undefined,
-    pricePerKg: row.price_per_kg,
-    stock: row.stock,
-    variety: row.variety,
-    origin: row.origin,
-    tasteProfile: row.taste_profile,
-    isAvailable: row.is_available,
-    variants: row.variants ?? [{ weight: '1kg', price: row.price_per_kg }],
-  };
-}
-
-async function fetchProducts(signal?: AbortSignal) {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase environment variables are missing.');
-  }
-
-  const response = await fetch(`${supabaseUrl}/rest/v1/products?select=*&order=name.asc`, {
-    headers: {
-      apikey: supabaseAnonKey,
-      Authorization: `Bearer ${supabaseAnonKey}`,
-    },
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to load products (${response.status})`);
-  }
-
-  const rows = (await response.json()) as ProductRow[];
-  return rows.map(mapProductRow);
-}
 
 function readCachedProducts() {
   if (memoryCache && Date.now() - memoryCache.timestamp < CACHE_TTL_MS) {
@@ -146,7 +86,7 @@ export function useProducts() {
 
     const loadProducts = async () => {
       try {
-        const nextProducts = await fetchProducts(abortController.signal);
+        const nextProducts = await fetchStorefrontProducts(abortController.signal);
         writeCachedProducts(nextProducts);
         setError(null);
         setProducts(nextProducts);

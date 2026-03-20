@@ -5,7 +5,7 @@ import { BrandLogo } from './BrandLogo';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-mango-dark text-white pt-16 pb-8">
+    <footer className="bg-mango-dark text-white pt-16 pb-8 [content-visibility:auto] [contain-intrinsic-size:1px_640px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-4">
