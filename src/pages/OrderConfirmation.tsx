@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { mapOrderRow, supabase } from '../supabase';
 import { getLocalDevOrderById } from '../lib/localDevOrders';
 import { formatCurrency } from '../lib/format';
@@ -12,38 +13,26 @@ import { useAuth } from '../context/AuthContext';
 export const OrderConfirmation: React.FC = () => {
   const { orderId } = useParams();
   const { user, isAdmin } = useAuth();
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchOrder = async () => {
+  const { data: order, isLoading: loading } = useQuery<Order | null>({
+    queryKey: ['order-confirmation', orderId, user?.id ?? null, isAdmin],
+    enabled: Boolean(orderId),
+    queryFn: async () => {
       if (!orderId) {
-        setLoading(false);
-        return;
+        return null;
       }
 
       const recentOrder = getRecentOrderById(orderId);
       if (recentOrder) {
-        setOrder(recentOrder);
-        setLoading(false);
-        return;
+        return recentOrder;
       }
 
       const localOrder = getLocalDevOrderById(orderId);
       if (localOrder) {
-        setOrder(localOrder);
-        setLoading(false);
-        return;
+        return localOrder;
       }
 
-      if (!user && !isAdmin) {
-        setLoading(false);
-        return;
-      }
-
-      if (!hasSupabaseConfig) {
-        setLoading(false);
-        return;
+      if ((!user && !isAdmin) || !hasSupabaseConfig) {
+        return null;
       }
 
       let query = supabase
@@ -58,14 +47,12 @@ export const OrderConfirmation: React.FC = () => {
       const { data, error } = await query.maybeSingle();
 
       if (error) {
-        console.error('Failed to load order', error);
-      } else if (data) {
-        setOrder(mapOrderRow(data));
+        throw error;
       }
-      setLoading(false);
-    };
-    fetchOrder();
-  }, [isAdmin, orderId, user]);
+
+      return data ? mapOrderRow(data) : null;
+    },
+  });
 
   if (loading) {
     return (

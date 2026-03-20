@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Mango hero illustration</title>
+  <desc id="desc">A warm orchard themed background with stylized mangoes.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2d1f0f"/>
+      <stop offset="45%" stop-color="#72461d"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" x2="1">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#fb923c"/>
+    </linearGradient>
+    <linearGradient id="mango" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#facc15"/>
+      <stop offset="55%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1260" cy="180" r="120" fill="url(#sun)" opacity="0.9"/>
+  <path d="M0 650C170 590 300 610 450 665S760 785 930 730s270-145 420-130 200 65 250 95v205H0Z" fill="#3f6212" opacity="0.55"/>
+  <path d="M0 710C185 630 325 660 480 730s325 120 505 70 315-135 440-115 140 40 175 60v155H0Z" fill="#14532d" opacity="0.75"/>
+  <g opacity="0.95">
+    <path d="M420 295c76-108 219-93 280 4 54 87 14 231-135 280-132 43-222-30-246-118-16-58 6-116 53-166 15-16 32-31 48-42Z" fill="url(#mango)"/>
+    <path d="M551 210c27-35 57-54 90-57 31-2 56 9 76 34-55-8-104 8-146 48Z" fill="#14532d"/>
+  </g>
+  <g opacity="0.78">
+    <path d="M1020 405c58-82 168-71 214 3 42 68 11 176-103 214-101 32-170-23-188-90-12-44 4-89 40-127 11-13 24-24 37-35Z" fill="#fde047"/>
+    <path d="M1118 339c20-26 43-40 68-43 22-1 42 7 57 26-41-6-78 6-125 36Z" fill="#166534"/>
+  </g>
+  <g opacity="0.5">
+    <path d="M123 196c38-54 111-48 143 1 28 46 7 117-69 143-66 21-115-14-127-61-8-30 2-60 27-83 8-8 17-16 26-22Z" fill="#fde68a"/>
+    <path d="M189 153c14-18 29-27 45-29 15 0 28 5 39 18-27-4-51 4-84 25Z" fill="#166534"/>
+  </g>
+</svg>

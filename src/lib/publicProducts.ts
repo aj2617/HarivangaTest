@@ -15,6 +15,11 @@ type ProductRow = {
   variants: ProductVariant[] | null;
 };
 
+type StorefrontProductFilters = {
+  search?: string;
+  variety?: string;
+};
+
 const STOREFRONT_PRODUCT_SELECT =
   'id,name,image,price_per_kg,stock,variety,origin,is_available,variants';
 const PRODUCT_DETAIL_SELECT =
@@ -68,8 +73,22 @@ async function requestProducts(query: string, signal?: AbortSignal) {
   return response.json();
 }
 
-export async function fetchStorefrontProducts(signal?: AbortSignal) {
-  const rows = (await requestProducts(`select=${STOREFRONT_PRODUCT_SELECT}&order=name.asc`, signal)) as ProductRow[];
+export async function fetchStorefrontProducts(filters?: StorefrontProductFilters, signal?: AbortSignal) {
+  const params = new URLSearchParams();
+  params.set('select', STOREFRONT_PRODUCT_SELECT);
+  params.set('order', 'name.asc');
+
+  const search = filters?.search?.trim();
+  if (search) {
+    params.set('or', `(name.ilike.%${search}%,variety.ilike.%${search}%)`);
+  }
+
+  const variety = filters?.variety?.trim();
+  if (variety && variety !== 'All') {
+    params.set('variety', `eq.${variety}`);
+  }
+
+  const rows = (await requestProducts(params.toString(), signal)) as ProductRow[];
   return rows.map(mapPublicProductRow);
 }
 

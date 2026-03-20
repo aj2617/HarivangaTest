@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Premium mango illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff1f2"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <linearGradient id="fruit" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="60%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" rx="48" fill="url(#bg)"/>
+  <path d="M247 279c73-99 203-90 266 0 60 86 30 231-113 303-144 73-262 3-290-100-20-71 11-146 80-196 18-14 35-24 57-33Z" fill="url(#fruit)"/>
+  <path d="M409 182c27-35 54-52 85-53 28-1 54 10 76 32-54-5-103 10-161 47Z" fill="#14532d"/>
+  <ellipse cx="348" cy="431" rx="78" ry="122" fill="#fff7ed" opacity="0.14"/>
+</svg>

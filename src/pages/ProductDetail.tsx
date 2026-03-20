@@ -18,6 +18,7 @@ import { fetchStorefrontProductById } from '../lib/publicProducts';
 import { useProducts } from '../hooks/useProducts';
 import { formatCurrency } from '../lib/format';
 import { Product } from '../types';
+import { getThumbnailImageSrc } from '../lib/imageSources';
 
 export const ProductDetail: React.FC = () => {
   const { id } = useParams();
@@ -157,9 +158,10 @@ export const ProductDetail: React.FC = () => {
                 src={selectedImage || product.image}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                referrerPolicy="no-referrer"
                 decoding="async"
                 fetchPriority="high"
+                width={960}
+                height={960}
                 sizes="(min-width: 1024px) 50vw, 100vw"
               />
               <div className="absolute top-6 left-6 flex flex-col gap-2">
@@ -184,11 +186,13 @@ export const ProductDetail: React.FC = () => {
                       className={`overflow-hidden rounded-2xl border-2 ${isActive ? 'border-mango-orange' : 'border-transparent'}`}
                     >
                       <img
-                        src={image}
+                        src={getThumbnailImageSrc(image)}
                         alt={`${product.name} view ${index + 1}`}
                         className="aspect-square h-full w-full object-cover"
                         loading="lazy"
                         decoding="async"
+                        width={240}
+                        height={240}
                         sizes="(min-width: 640px) 25vw, 33vw"
                       />
                     </button>

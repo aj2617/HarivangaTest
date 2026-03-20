@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   getAuthErrorMessage,
   mapOrderRow,
@@ -21,9 +22,7 @@ type AuthMode = 'signin' | 'signup';
 
 export const Account: React.FC = () => {
   const { user, profile } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([]);
   const [phone, setPhone] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>('signin');
@@ -37,6 +36,56 @@ export const Account: React.FC = () => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const navigate = useNavigate();
+  const normalizedPhone = useMemo(() => normalizePhoneNumber(phone), [phone]);
+
+  const ordersQuery = useQuery<Order[]>({
+    queryKey: ['account-orders', normalizedPhone, user?.id ?? null],
+    enabled: hasSearched && normalizedPhone.length > 0,
+    queryFn: async () => {
+      if (!normalizedPhone) {
+        return [];
+      }
+
+      if (!canUseLocalOrderFallback() && !user) {
+        throw new Error('Sign in with your email and password to view your orders in production.');
+      }
+
+      const localOrders = findLocalDevOrdersByPhone(phone);
+      const orderMap = new Map<string, Order>();
+      localOrders.forEach((order) => {
+        orderMap.set(order.id, order);
+      });
+
+      if (canUseLocalOrderFallback()) {
+        return Array.from(orderMap.values()).sort(
+          (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+        ).slice(0, 1);
+      }
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user!.id)
+        .eq('customer_phone_normalized', normalizedPhone)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      (data ?? []).forEach((row) => {
+        const order = mapOrderRow(row);
+        orderMap.set(order.id, order);
+      });
+
+      return Array.from(orderMap.values()).sort(
+        (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+      ).slice(0, 1);
+    },
+  });
+
+  const orders = ordersQuery.data ?? [];
+  const isSearching = ordersQuery.isFetching;
 
   const handleAuthSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -88,7 +137,6 @@ export const Account: React.FC = () => {
     setIsSigningOut(true);
     try {
       await signOutUser();
-      setOrders([]);
       setHasSearched(false);
       setSearchError(null);
       setAuthMessage('Signed out successfully.');
@@ -101,74 +149,24 @@ export const Account: React.FC = () => {
 
   const handleTrackOrders = async (e: React.FormEvent) => {
     e.preventDefault();
-    const normalizedPhone = normalizePhoneNumber(phone);
     if (!normalizedPhone) {
       setSearchError('Enter the phone number used for the order.');
       return;
     }
 
-    setIsSearching(true);
     setSearchError(null);
     setHasSearched(true);
+    void ordersQuery.refetch().then((result) => {
+      if (result.error) {
+        const fallbackOrders = findLocalDevOrdersByPhone(phone);
+        if (fallbackOrders.length > 0) {
+          setSearchError(null);
+          return;
+        }
 
-    try {
-      if (!canUseLocalOrderFallback() && !user) {
-        setOrders([]);
-        setSearchError('Sign in with your email and password to view your orders in production.');
-        return;
+        setSearchError(result.error.message || 'Could not check order status right now. Please try again.');
       }
-
-      const localOrders = findLocalDevOrdersByPhone(phone);
-      const orderMap = new Map<string, Order>();
-
-      localOrders.forEach((order) => {
-        orderMap.set(order.id, order);
-      });
-
-      if (canUseLocalOrderFallback()) {
-        setOrders(
-          Array.from(orderMap.values()).sort(
-            (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-          ).slice(0, 1)
-        );
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', user!.id)
-        .eq('customer_phone_normalized', normalizedPhone)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      (data ?? []).forEach((row) => {
-        const order = mapOrderRow(row);
-        orderMap.set(order.id, order);
-      });
-
-      const matchedOrders = Array.from(orderMap.values()).sort(
-        (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-      );
-
-      setOrders(matchedOrders.slice(0, 1));
-    } catch (error) {
-      console.error('Failed to track orders by phone number', error);
-      const fallbackOrders = findLocalDevOrdersByPhone(phone);
-      if (fallbackOrders.length > 0) {
-        setOrders(fallbackOrders.slice(0, 1));
-        setSearchError(null);
-        return;
-      }
-
-      setOrders([]);
-      setSearchError('Could not check order status right now. Please try again.');
-    } finally {
-      setIsSearching(false);
-    }
+    });
   };
 
   return (

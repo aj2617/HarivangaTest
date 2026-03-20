@@ -1,14 +1,21 @@
 import { Product } from '../types';
 
+const HARIVANGA_ART = '/images/downloaded/hero.webp';
+const LANGRA_ART = '/images/downloaded/pattern.webp';
+const ALPHONSO_ART = '/images/downloaded/farm.webp';
+const HIMSAGAR_ART = '/images/downloaded/himsagar.webp';
+const MIXED_BOX_ART = '/images/downloaded/mixed.webp';
+const FAZLI_ART = '/images/downloaded/fazli.webp';
+
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: 'harivanga-01',
     name: 'Signature Harivanga',
     description: 'Rangpur\'s famous Harivanga mango with a thin seed, dense pulp, and a clean honeyed finish.',
-    image: 'https://images.unsplash.com/photo-1623932292087-35dfdb0f2f5f?auto=format&fit=crop&q=72&w=640',
+    image: HARIVANGA_ART,
     images: [
-      'https://images.unsplash.com/photo-1623932292087-35dfdb0f2f5f?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1623932292267-6d7f4d8ef1ce?auto=format&fit=crop&q=72&w=640',
+      HARIVANGA_ART,
+      HIMSAGAR_ART,
     ],
     pricePerKg: 140,
     stock: 650,
@@ -26,10 +33,10 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'himsagar-01',
     name: 'Premium Himsagar',
     description: 'Known as the "King of Mangoes" in Bengal, Himsagar is famous for its sweet aroma and fiberless flesh.',
-    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=72&w=640',
+    image: HIMSAGAR_ART,
     images: [
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=72&w=640',
+      HIMSAGAR_ART,
+      ALPHONSO_ART,
     ],
     pricePerKg: 120,
     stock: 500,
@@ -47,10 +54,10 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'langra-01',
     name: 'Rajshahi Langra',
     description: 'Langra mangoes are known for their unique green skin even when ripe and their incredibly sweet, tangy flavor.',
-    image: 'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=72&w=640',
+    image: LANGRA_ART,
     images: [
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1611273426858-4506f0d7a6a4?auto=format&fit=crop&q=72&w=640',
+      LANGRA_ART,
+      MIXED_BOX_ART,
     ],
     pricePerKg: 100,
     stock: 300,
@@ -68,10 +75,10 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'alphonso-01',
     name: 'Premium Alphonso',
     description: 'The global favorite, Alphonso is known for its rich, creamy texture and vibrant orange flesh.',
-    image: 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&q=72&w=640',
+    image: ALPHONSO_ART,
     images: [
-      'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&q=72&w=640',
+      ALPHONSO_ART,
+      FAZLI_ART,
     ],
     pricePerKg: 250,
     stock: 100,
@@ -88,9 +95,9 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'amrapali-01',
     name: 'Sweet Amrapali',
     description: 'A hybrid variety that is exceptionally sweet and has a deep orange pulp.',
-    image: 'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=72&w=640',
+    image: LANGRA_ART,
     images: [
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=72&w=640',
+      LANGRA_ART,
     ],
     pricePerKg: 90,
     stock: 0,
@@ -107,10 +114,10 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'fazli-01',
     name: 'Royal Fazli',
     description: 'Large-sized Fazli mangoes with generous pulp and balanced sweetness, ideal for family orders and gifts.',
-    image: 'https://images.unsplash.com/photo-1519096845289-95806ee03a1a?auto=format&fit=crop&q=72&w=640',
+    image: ALPHONSO_ART,
     images: [
-      'https://images.unsplash.com/photo-1519096845289-95806ee03a1a?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1587486936730-78b1fd1c61f2?auto=format&fit=crop&q=72&w=640',
+      FAZLI_ART,
+      MIXED_BOX_ART,
     ],
     pricePerKg: 110,
     stock: 420,
@@ -128,9 +135,9 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'gopalbhog-01',
     name: 'Early Gopalbhog',
     description: 'One of the season\'s earliest arrivals, known for its fragrant flesh and soft bite.',
-    image: 'https://images.unsplash.com/photo-1574226516831-e1dff420e37f?auto=format&fit=crop&q=72&w=640',
+    image: HARIVANGA_ART,
     images: [
-      'https://images.unsplash.com/photo-1574226516831-e1dff420e37f?auto=format&fit=crop&q=72&w=640',
+      HARIVANGA_ART,
     ],
     pricePerKg: 115,
     stock: 260,
@@ -147,10 +154,10 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'podangonj-special-01',
     name: 'Podagonj Special Harivanga',
     description: 'A selected Podagonj lot of Harivanga mangoes chosen for compact seed and deep sweetness.',
-    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=72&w=640',
+    image: HARIVANGA_ART,
     images: [
-      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1623932292087-35dfdb0f2f5f?auto=format&fit=crop&q=72&w=640',
+      HARIVANGA_ART,
+      HIMSAGAR_ART,
     ],
     pricePerKg: 150,
     stock: 340,
@@ -168,11 +175,11 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'mixed-box-01',
     name: 'Seasonal Mixed Box',
     description: 'A curated box of seasonal mango varieties for customers who want to taste more than one orchard style.',
-    image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&q=72&w=640',
+    image: MIXED_BOX_ART,
     images: [
-      'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&q=72&w=640',
-      'https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=72&w=640',
+      MIXED_BOX_ART,
+      ALPHONSO_ART,
+      LANGRA_ART,
     ],
     pricePerKg: 135,
     stock: 180,

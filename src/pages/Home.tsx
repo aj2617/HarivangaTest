@@ -1,12 +1,94 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
+import { ArrowRight, PlayCircle, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { useProducts } from '../hooks/useProducts';
+
+const ADMIN_SETTINGS_KEY = 'harivanga_admin_settings';
+const LEGACY_ADMIN_SETTINGS_KEY = 'mangobd_admin_settings';
+
+type HomePromotion = {
+  promoVideoUrl: string;
+  promoDescription: string;
+};
+
+const DEFAULT_HOME_PROMOTION: HomePromotion = {
+  promoVideoUrl: '',
+  promoDescription: '',
+};
+
+const loadHomePromotion = (): HomePromotion => {
+  if (typeof window === 'undefined') return DEFAULT_HOME_PROMOTION;
+
+  try {
+    const raw =
+      window.localStorage.getItem(ADMIN_SETTINGS_KEY) ??
+      window.localStorage.getItem(LEGACY_ADMIN_SETTINGS_KEY);
+
+    if (!raw) return DEFAULT_HOME_PROMOTION;
+
+    const parsed = JSON.parse(raw) as Partial<HomePromotion>;
+    return {
+      promoVideoUrl: parsed.promoVideoUrl?.trim() ?? '',
+      promoDescription: parsed.promoDescription?.trim() ?? '',
+    };
+  } catch {
+    return DEFAULT_HOME_PROMOTION;
+  }
+};
+
+const getYoutubeEmbedUrl = (url: string): string | null => {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, '');
+
+    if (host === 'youtu.be') {
+      const id = parsed.pathname.split('/').filter(Boolean)[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      if (parsed.pathname === '/watch') {
+        const id = parsed.searchParams.get('v');
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+
+      if (parsed.pathname.startsWith('/embed/')) {
+        return url;
+      }
+
+      if (parsed.pathname.startsWith('/shorts/')) {
+        const id = parsed.pathname.split('/')[2];
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+const isDirectVideoFile = (url: string): boolean => /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
 
 export const Home: React.FC = () => {
   const { products } = useProducts();
   const featuredProducts = products.slice(0, 4);
+  const [promotion, setPromotion] = useState<HomePromotion>(DEFAULT_HOME_PROMOTION);
+  const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
+
+  useEffect(() => {
+    setPromotion(loadHomePromotion());
+  }, []);
+
+  useEffect(() => {
+    setIsPromoVideoOpen(false);
+  }, [promotion.promoVideoUrl]);
+
+  const promoVideoUrl = promotion.promoVideoUrl.trim();
+  const promoDescription = promotion.promoDescription.trim();
+  const promoEmbedUrl = promoVideoUrl ? getYoutubeEmbedUrl(promoVideoUrl) : null;
+  const showPromotion = promoVideoUrl.length > 0;
 
   return (
     <div className="flex flex-col">
@@ -14,15 +96,9 @@ export const Home: React.FC = () => {
       <section className="relative min-h-[calc(100vh-4rem)] sm:min-h-[680px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=68&w=1280"
-            srcSet="
-              https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=62&w=640 640w,
-              https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=66&w=960 960w,
-              https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=68&w=1280 1280w
-            "
+            src="/images/downloaded/hero.webp"
             alt="Fresh Mangoes"
             className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
             fetchPriority="high"
             loading="eager"
             decoding="async"
@@ -126,11 +202,73 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
+      {showPromotion && (
+        <section className="bg-[#fff8f1] py-20 [content-visibility:auto] [contain-intrinsic-size:1px_760px]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-10 max-w-2xl">
+              <span className="text-sm font-bold uppercase tracking-[0.2em] text-mango-orange">Promotion</span>
+              <h2 className="mt-3 text-3xl font-black text-[#201b16] sm:text-4xl">Watch Our Latest Story</h2>
+              {promoDescription && (
+                <p className="mt-4 text-base leading-relaxed text-[#6f6255]">{promoDescription}</p>
+              )}
+            </div>
+
+            <div className="overflow-hidden rounded-[32px] border border-[#eadfce] bg-white shadow-sm">
+              <div className="aspect-video bg-[#201b16]">
+                {!isPromoVideoOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsPromoVideoOpen(true)}
+                    className="flex h-full w-full flex-col items-center justify-center gap-4 bg-[radial-gradient(circle_at_center,_rgba(245,158,11,0.32),_rgba(32,27,22,0.98)_62%)] px-6 text-center text-white"
+                  >
+                    <PlayCircle size={56} className="text-mango-yellow" />
+                    <p className="text-lg font-bold">Play promotion video</p>
+                    <p className="max-w-xl text-sm text-white/75">The video loads only after click to keep the home page lighter.</p>
+                  </button>
+                ) : promoEmbedUrl ? (
+                  <iframe
+                    src={`${promoEmbedUrl}${promoEmbedUrl.includes('?') ? '&' : '?'}autoplay=1`}
+                    title="Promotion video"
+                    className="h-full w-full"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                ) : isDirectVideoFile(promoVideoUrl) ? (
+                  <video
+                    src={promoVideoUrl}
+                    controls
+                    preload="metadata"
+                    autoPlay
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center text-white">
+                    <PlayCircle size={52} className="text-mango-yellow" />
+                    <p className="max-w-xl text-sm text-white/80">This promotion uses an external video link. Open it directly to watch.</p>
+                    <a
+                      href={promoVideoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full bg-mango-orange px-5 py-3 text-sm font-bold text-white transition hover:bg-mango-orange/90"
+                    >
+                      Watch Video
+                      <ArrowRight size={16} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Why Choose Us */}
       <section className="py-24 bg-mango-dark text-white overflow-hidden relative [content-visibility:auto] [contain-intrinsic-size:1px_1100px]">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
           <img 
-            src="https://images.unsplash.com/photo-1591073113125-e46713c829ed?auto=format&fit=crop&q=72&w=640" 
+            src="/images/downloaded/pattern.webp" 
             alt="Pattern" 
             className="w-full h-full object-cover"
             loading="lazy"
@@ -171,7 +309,7 @@ export const Home: React.FC = () => {
             <div className="relative">
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&q=72&w=640" 
+                  src="/images/downloaded/farm.webp" 
                   alt="Farm" 
                   className="w-full h-full object-cover"
                   loading="lazy"

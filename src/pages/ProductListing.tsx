@@ -4,18 +4,15 @@ import { ProductCard } from '../components/ProductCard';
 import { useProducts } from '../hooks/useProducts';
 
 export const ProductListing: React.FC = () => {
-  const { products, loading } = useProducts();
+  const { products: allProducts } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVariety, setSelectedVariety] = useState('All');
-
-  const varieties = ['All', ...Array.from(new Set(products.map(p => p.variety)))];
-
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         product.variety.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesVariety = selectedVariety === 'All' || product.variety === selectedVariety;
-    return matchesSearch && matchesVariety;
+  const { products, loading } = useProducts({
+    search: searchQuery,
+    variety: selectedVariety,
   });
+
+  const varieties = ['All', ...Array.from(new Set(allProducts.map(p => p.variety)))];
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -60,9 +57,9 @@ export const ProductListing: React.FC = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-2">Loading products...</h3>
             <p className="text-gray-500">Fetching the latest product list.</p>
           </div>
-        ) : filteredProducts.length > 0 ? (
+        ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 [content-visibility:auto] [contain-intrinsic-size:1px_1400px]">
-            {filteredProducts.map((product, index) => (
+            {products.map((product, index) => (
               <div
                 key={product.id}
                 className="fade-up-enter"
