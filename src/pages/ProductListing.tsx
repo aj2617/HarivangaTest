@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, SlidersHorizontal } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
-import { Seo } from '../components/Seo';
 import { useProducts } from '../hooks/useProducts';
 
 export const ProductListing: React.FC = () => {
@@ -20,21 +19,6 @@ export const ProductListing: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <Seo
-        title="Shop Harivanga and Premium Mangoes"
-        description="Browse Harivanga and premium mango varieties from Podaganj, Mithapukur, Rangpur. Compare varieties, prices, and order fresh seasonal mangoes online."
-        path="/products"
-        keywords={['shop mangoes', 'Harivanga shop', 'premium mango Bangladesh', 'Rangpur Harivanga', 'buy mango online']}
-        schema={{
-          '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
-          name: 'Shop Harivanga and Premium Mangoes',
-          url: 'https://harivanga.com/products',
-          description:
-            'Browse Harivanga and premium mango varieties from Podaganj, Mithapukur, Rangpur.',
-        }}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>

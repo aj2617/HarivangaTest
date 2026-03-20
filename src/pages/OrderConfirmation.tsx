@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { mapOrderRow, supabase } from '../supabase';
-import { Seo } from '../components/Seo';
 import { getLocalDevOrderById } from '../lib/localDevOrders';
 import { formatCurrency } from '../lib/format';
 import { getRecentOrderById } from '../lib/recentOrders';
@@ -71,7 +70,6 @@ export const OrderConfirmation: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Seo title="Order Confirmation" description="View your order confirmation." path={`/order-confirmation/${orderId ?? ''}`} robots="noindex,nofollow" />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mango-orange"></div>
       </div>
     );
@@ -80,7 +78,6 @@ export const OrderConfirmation: React.FC = () => {
   if (!order) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <Seo title="Order Confirmation" description="View your order confirmation." path={`/order-confirmation/${orderId ?? ''}`} robots="noindex,nofollow" />
         <h2 className="text-2xl font-bold mb-4">Order not found</h2>
         <Link to="/" className="text-mango-orange font-bold">Back to Home</Link>
       </div>
@@ -89,7 +86,6 @@ export const OrderConfirmation: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <Seo title="Order Confirmation" description="View your order confirmation." path={`/order-confirmation/${orderId ?? ''}`} robots="noindex,nofollow" />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="fade-up-enter bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="bg-mango-orange p-12 text-center text-white relative overflow-hidden">

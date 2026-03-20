@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Seo } from '../components/Seo';
 import { formatCurrency } from '../lib/format';
 
 export const CartPage: React.FC = () => {
@@ -30,8 +29,6 @@ export const CartPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <Seo title="Shopping Cart" description="Review selected mangoes before checkout." path="/cart" robots="noindex,nofollow" />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-black text-mango-dark mb-12">Shopping Cart ({totalItems})</h1>
 

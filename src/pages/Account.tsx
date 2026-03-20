@@ -8,7 +8,6 @@ import {
   signUpWithEmail,
   supabase,
 } from '../supabase';
-import { Seo } from '../components/Seo';
 import { canUseLocalOrderFallback, findLocalDevOrdersByPhone } from '../lib/localDevOrders';
 import { formatCurrency } from '../lib/format';
 import { Order } from '../types';
@@ -174,8 +173,6 @@ export const Account: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <Seo title="Track Order" description="Track your mango order by phone number." path="/account" robots="noindex,nofollow" />
-
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="fade-up-enter bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
           <div className="max-w-2xl">

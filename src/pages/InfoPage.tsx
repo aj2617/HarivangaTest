@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ArrowRight, Clock3, Leaf, MapPin, ShieldCheck, Sprout, SunMedium, Truck, Trophy } from 'lucide-react';
-import { Seo } from '../components/Seo';
 
 type InfoSection = {
   heading: string;
@@ -133,25 +132,6 @@ export const InfoPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen ${isAboutPage ? 'bg-[radial-gradient(circle_at_top,#fff7eb_0%,#fffdf9_38%,#f7f7f5_100%)]' : 'bg-gray-50'}`}>
-      <Seo
-        title={page.title}
-        description={page.intro}
-        path={pathname}
-        type={isAboutPage ? 'article' : 'website'}
-        keywords={
-          isAboutPage
-            ? ['Harivanga story', 'Podaganj', 'Mithapukur', 'Rangpur', 'GI mango Bangladesh']
-            : [page.title, 'Harivanga.com', 'mango delivery Bangladesh']
-        }
-        schema={{
-          '@context': 'https://schema.org',
-          '@type': isAboutPage ? 'AboutPage' : 'WebPage',
-          name: page.title,
-          description: page.intro,
-          url: `https://harivanga.com${pathname}`,
-        }}
-      />
-
       <section className="bg-mango-dark text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <p className="text-xs font-bold uppercase tracking-[0.35em] text-mango-yellow/80">{page.eyebrow}</p>

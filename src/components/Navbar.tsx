@@ -3,7 +3,6 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, Menu, X, LogOut } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { signOutUser } from '../supabase';
 import { BrandLogo } from './BrandLogo';
 
 export const Navbar: React.FC = () => {
@@ -13,6 +12,7 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    const { signOutUser } = await import('../supabase');
     await signOutUser();
     navigate('/');
   };

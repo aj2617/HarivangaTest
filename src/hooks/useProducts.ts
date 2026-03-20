@@ -6,12 +6,72 @@ import {
 } from '../lib/localDevProducts';
 import { STOREFRONT_PRODUCTS_CACHE_KEY, STOREFRONT_PRODUCTS_CHANGED_EVENT } from '../lib/storefrontSync';
 import { hasSupabaseConfig } from '../lib/env';
-import { mapProductRow, supabase } from '../supabase';
 import { Product } from '../types';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
+type ProductVariant = {
+  weight: string;
+  price: number;
+};
+
+type ProductRow = {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  images: string[] | null;
+  price_per_kg: number;
+  stock: number;
+  variety: string;
+  origin: string;
+  taste_profile: string;
+  is_available: boolean;
+  variants: ProductVariant[] | null;
+};
+
 let memoryCache: { products: Product[]; timestamp: number } | null = null;
+
+function mapProductRow(row: ProductRow): Product {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    image: row.image,
+    images: row.images ?? undefined,
+    pricePerKg: row.price_per_kg,
+    stock: row.stock,
+    variety: row.variety,
+    origin: row.origin,
+    tasteProfile: row.taste_profile,
+    isAvailable: row.is_available,
+    variants: row.variants ?? [{ weight: '1kg', price: row.price_per_kg }],
+  };
+}
+
+async function fetchProducts(signal?: AbortSignal) {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase environment variables are missing.');
+  }
+
+  const response = await fetch(`${supabaseUrl}/rest/v1/products?select=*&order=name.asc`, {
+    headers: {
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    },
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to load products (${response.status})`);
+  }
+
+  const rows = (await response.json()) as ProductRow[];
+  return rows.map(mapProductRow);
+}
 
 function readCachedProducts() {
   if (memoryCache && Date.now() - memoryCache.timestamp < CACHE_TTL_MS) {
@@ -62,6 +122,7 @@ export function useProducts() {
   useEffect(() => {
     const win = typeof window !== 'undefined' ? window : null;
     const localDevMode = isLocalDevAdminMode();
+    const abortController = new AbortController();
 
     const refreshLocalProducts = () => {
       const nextProducts = getLocalDevProducts();
@@ -84,20 +145,19 @@ export function useProducts() {
     }
 
     const loadProducts = async () => {
-      const { data, error } = await supabase.from('products').select('*').order('name', { ascending: true });
-
-      if (error) {
+      try {
+        const nextProducts = await fetchProducts(abortController.signal);
+        writeCachedProducts(nextProducts);
+        setError(null);
+        setProducts(nextProducts);
+      } catch (error) {
+        if (abortController.signal.aborted) {
+          return;
+        }
         console.error('Failed to load storefront products', error);
         setError('Could not load the product catalog.');
         setProducts([]);
-        setLoading(false);
-        return;
       }
-
-      const nextProducts = (data ?? []).map(mapProductRow);
-      writeCachedProducts(nextProducts);
-      setError(null);
-      setProducts(nextProducts);
       setLoading(false);
     };
 
@@ -117,58 +177,13 @@ export function useProducts() {
       void loadProducts();
     }
 
-    let cancelled = false;
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-    let idleHandle:
-      | { type: 'idle'; id: number }
-      | { type: 'timeout'; id: number }
-      | null = null;
     const handleStorefrontRefresh = () => {
       void loadProducts();
     };
     win?.addEventListener(STOREFRONT_PRODUCTS_CHANGED_EVENT, handleStorefrontRefresh);
-    if (win && 'requestIdleCallback' in win) {
-      idleHandle = {
-        type: 'idle',
-        id: win.requestIdleCallback(
-            () => {
-              if (cancelled) return;
-              channel = supabase
-                .channel('storefront-products')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-                  void loadProducts();
-                })
-                .subscribe();
-            },
-            { timeout: 2000 }
-          ),
-      };
-    } else if (win) {
-      idleHandle = {
-        type: 'timeout',
-        id: win.setTimeout(() => {
-            if (cancelled) return;
-            channel = supabase
-              .channel('storefront-products')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-                void loadProducts();
-                })
-                .subscribe();
-          }, 1200),
-      };
-    }
 
     return () => {
-      cancelled = true;
-      if (idleHandle?.type === 'timeout') {
-        win?.clearTimeout(idleHandle.id);
-      } else if (idleHandle?.type === 'idle' && win && 'cancelIdleCallback' in win) {
-        win.cancelIdleCallback(idleHandle.id);
-      }
-
-      if (channel) {
-        void supabase.removeChannel(channel);
-      }
+      abortController.abort();
       win?.removeEventListener(STOREFRONT_PRODUCTS_CHANGED_EVENT, handleStorefrontRefresh);
     };
   }, []);

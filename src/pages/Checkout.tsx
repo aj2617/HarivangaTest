@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { mapOrderToRow, supabase } from '../supabase';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Seo } from '../components/Seo';
 import { hasSupabaseConfig } from '../lib/env';
 import { canUseLocalOrderFallback, saveLocalDevOrder } from '../lib/localDevOrders';
 import { CheckCircle2, CreditCard, Truck, MapPin, Phone, User as UserIcon, Building2, LocateFixed } from 'lucide-react';
@@ -197,8 +196,6 @@ export const Checkout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <Seo title="Checkout" description="Complete your mango order securely." path="/checkout" robots="noindex,nofollow" />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">

@@ -8,7 +8,6 @@ import { getLocalDevProducts, isLocalDevAdminMode, isLocalDevHost, LOCAL_DEV_ADM
 import { getLocalDevOrders, LOCAL_DEV_ORDERS_UPDATED_EVENT, setLocalDevOrders } from '../lib/localDevOrders';
 import { notifyStorefrontProductsChanged } from '../lib/storefrontSync';
 import { BrandLogo } from '../components/BrandLogo';
-import { Seo } from '../components/Seo';
 import { 
   LayoutDashboard, Package, ShoppingBag, TrendingUp, 
   Plus, Edit2, Trash2, Clock, 
@@ -667,7 +666,6 @@ export const AdminDashboard: React.FC = () => {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Seo title="Admin Portal" description="Secure admin access." path="/admin" robots="noindex,nofollow" />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mango-orange"></div>
       </div>
     );
@@ -676,7 +674,6 @@ export const AdminDashboard: React.FC = () => {
   if (errorMessage) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <Seo title="Admin Portal" description="Secure admin access." path="/admin" robots="noindex,nofollow" />
         <h2 className="text-2xl font-bold mb-4">Admin Data Error</h2>
         <p className="text-gray-500 mb-8 text-center max-w-md">{errorMessage}</p>
         <button onClick={() => window.location.reload()} className="text-mango-orange font-bold">Reload Page</button>
@@ -687,7 +684,6 @@ export const AdminDashboard: React.FC = () => {
   if (!hasAdminAccess) {
     return (
       <div className="min-h-screen bg-[#0c1326] px-4 py-4 sm:px-6 lg:px-8">
-        <Seo title="Admin Portal" description="Secure admin access." path="/admin" robots="noindex,nofollow" />
         <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-md items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -871,8 +867,6 @@ export const AdminDashboard: React.FC = () => {
       transition={panelTransition}
       className="min-h-screen bg-gray-50 flex flex-col lg:flex-row"
     >
-      <Seo title="Admin Dashboard" description="Secure admin management dashboard." path="/admin" robots="noindex,nofollow" />
-
       {/* Sidebar */}
       <aside className="w-64 bg-mango-dark text-white hidden lg:flex flex-col sticky top-0 h-screen">
         <div className="p-8">

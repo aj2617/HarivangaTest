@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
-import { Seo } from '../components/Seo';
 import { useProducts } from '../hooks/useProducts';
 
 export const Home: React.FC = () => {
@@ -11,31 +10,16 @@ export const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <Seo
-        title="Harivanga Mangoes From Podaganj, Mithapukur, Rangpur"
-        description="Order authentic Harivanga mangoes and premium seasonal varieties from Podaganj, Mithapukur, Rangpur. Tree-ripened, chemical-free, and delivered fresh."
-        path="/"
-        keywords={['Harivanga', 'Harivanga mango', 'Podaganj mango', 'Rangpur mango', 'buy mango online Bangladesh']}
-        schema={{
-          '@context': 'https://schema.org',
-          '@type': 'WebSite',
-          name: 'Harivanga.com',
-          url: 'https://harivanga.com/',
-          description:
-            'Order authentic Harivanga mangoes and premium seasonal varieties from Podaganj, Mithapukur, Rangpur.',
-          potentialAction: {
-            '@type': 'SearchAction',
-            target: 'https://harivanga.com/products',
-            'query-input': 'required name=search_term_string',
-          },
-        }}
-      />
-
       {/* Hero Section */}
       <section className="relative min-h-[calc(100vh-4rem)] sm:min-h-[680px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=1920"
+            src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=68&w=1280"
+            srcSet="
+              https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=62&w=640 640w,
+              https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=66&w=960 960w,
+              https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=68&w=1280 1280w
+            "
             alt="Fresh Mangoes"
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"

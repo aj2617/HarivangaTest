@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { auth, mapUserProfileRow, mapUserProfileToRow, supabase } from '../supabase';
 import { hasSupabaseConfig } from '../lib/env';
 import { UserProfile } from '../types';
 
@@ -32,6 +31,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let isMounted = true;
+    let supabaseModulePromise: Promise<typeof import('../supabase')> | null = null;
+    let unsubscribe = () => {};
+    let idleHandle:
+      | { type: 'idle'; id: number }
+      | { type: 'timeout'; id: ReturnType<typeof setTimeout> }
+      | null = null;
 
     if (!hasSupabaseConfig) {
       setUser(null);
@@ -42,12 +47,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
 
+    const loadSupabaseModule = () => {
+      if (!supabaseModulePromise) {
+        supabaseModulePromise = import('../supabase');
+      }
+      return supabaseModulePromise;
+    };
+
     const syncAuthState = async (authUser: User | null) => {
       setLoading(true);
       try {
         if (!isMounted) return;
         setUser(authUser);
         if (authUser) {
+          const { mapUserProfileRow, mapUserProfileToRow, supabase } = await loadSupabaseModule();
           const fallbackProfile = buildFallbackProfile(authUser, 'customer');
           const { data: existingProfileRow, error: profileError } = await supabase
             .from('users')
@@ -102,25 +115,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    void auth.getSession().then(({ data, error }) => {
-      if (error) {
-        console.error('Failed to load auth session', error);
+    const initializeAuth = async () => {
+      try {
+        const { auth } = await loadSupabaseModule();
+        const { data, error } = await auth.getSession();
+
+        if (error) {
+          console.error('Failed to load auth session', error);
+          if (isMounted) {
+            setLoading(false);
+          }
+          return;
+        }
+
+        await syncAuthState(data.session?.user ?? null);
+
+        const { data: subscription } = auth.onAuthStateChange((_event, session) => {
+          void syncAuthState(session?.user ?? null);
+        });
+        unsubscribe = () => subscription.subscription.unsubscribe();
+      } catch (error) {
+        console.error('Failed to initialize auth module', error);
         if (isMounted) {
           setLoading(false);
         }
-        return;
       }
+    };
 
-      void syncAuthState(data.session?.user ?? null);
-    });
-
-    const { data: subscription } = auth.onAuthStateChange((_event, session) => {
-      void syncAuthState(session?.user ?? null);
-    });
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleHandle = {
+        type: 'idle',
+        id: window.requestIdleCallback(() => {
+          void initializeAuth();
+        }, { timeout: 1500 }),
+      };
+    } else if (typeof window !== 'undefined') {
+      idleHandle = {
+        type: 'timeout',
+        id: setTimeout(() => {
+          void initializeAuth();
+        }, 800),
+      };
+    } else {
+      void initializeAuth();
+    }
 
     return () => {
       isMounted = false;
-      subscription.subscription.unsubscribe();
+      if (idleHandle?.type === 'timeout') {
+        clearTimeout(idleHandle.id);
+      } else if (idleHandle?.type === 'idle' && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleHandle.id);
+      }
+      unsubscribe();
     };
   }, []);
 

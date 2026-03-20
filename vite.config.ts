@@ -23,6 +23,9 @@ export default defineConfig(({ mode }) => {
       hmr: process.env.DISABLE_HMR !== 'true',
     },
     build: {
+      modulePreload: {
+        resolveDependencies: (_filename, deps) => deps.filter((dep) => !dep.includes('vendor-supabase') && !dep.includes('/supabase-')),
+      },
       rollupOptions: {
         output: {
           manualChunks(id) {

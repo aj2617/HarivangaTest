@@ -14,7 +14,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Seo } from '../components/Seo';
 import { useProducts } from '../hooks/useProducts';
 import { formatCurrency } from '../lib/format';
 
@@ -90,46 +89,6 @@ export const ProductDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      <Seo
-        title={product ? `${product.name} - ${product.variety}` : 'Product Details'}
-        description={
-          product
-            ? `${product.description} Origin: ${product.origin}. Taste profile: ${product.tasteProfile}. Starting from ${formatCurrency(product.pricePerKg)}/kg.`
-            : 'Explore authentic Harivanga and premium mango details, pricing, and delivery options.'
-        }
-        path={product ? `/product/${product.id}` : `/product/${id ?? ''}`}
-        image={product?.image}
-        type="product"
-        keywords={
-          product
-            ? [product.name, product.variety, `${product.origin} mango`, 'buy mango online Bangladesh']
-            : ['Harivanga mango', 'mango product details']
-        }
-        schema={
-          product
-            ? {
-                '@context': 'https://schema.org',
-                '@type': 'Product',
-                name: product.name,
-                image: [product.image, ...(product.images ?? [])],
-                description: product.description,
-                category: product.variety,
-                brand: {
-                  '@type': 'Brand',
-                  name: 'Harivanga.com',
-                },
-                offers: {
-                  '@type': 'Offer',
-                  priceCurrency: 'BDT',
-                  price: product.variants[0]?.price ?? product.pricePerKg,
-                  availability: product.isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-                  url: `https://harivanga.com/product/${product.id}`,
-                },
-              }
-            : null
-        }
-      />
-
       <div className="bg-gray-50 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-xs text-gray-500">
