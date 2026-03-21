@@ -169,7 +169,7 @@ export function useProducts(options?: UseProductsOptions) {
           return;
         }
 
-        if (nextProducts.length === 0) {
+        if (nextProducts.length === 0 && isDefaultQuery) {
           await applyFallbackProducts();
           return;
         }

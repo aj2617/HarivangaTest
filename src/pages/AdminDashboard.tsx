@@ -588,7 +588,7 @@ export const AdminDashboard: React.FC = () => {
     } catch (error) {
       const nextMessage = error instanceof Error ? error.message : 'Could not save the product.';
       setProductSubmitError(nextMessage);
-      handleDatabaseError(error, OperationType.WRITE, 'products');
+      console.error('Product save failed', error);
     } finally {
       setIsSavingProduct(false);
     }
