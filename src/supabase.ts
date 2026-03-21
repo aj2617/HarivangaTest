@@ -19,6 +19,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export const auth = supabase.auth;
 
+export const USER_PROFILE_SELECT = 'id,name,phone,email,role,saved_addresses';
+export const ORDER_SELECT =
+  'id,customer_name,customer_phone,customer_phone_normalized,delivery_address,delivery_area,delivery_division,delivery_district,delivery_location,delivery_method,delivery_date,payment_method,items,subtotal,delivery_charge,total,status,created_at,user_id';
+
 export enum OperationType {
   CREATE = 'create',
   UPDATE = 'update',

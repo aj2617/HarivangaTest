@@ -16,6 +16,14 @@ const mediumDateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
 });
 
+const orderTimestampFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+});
+
 export function formatShortMonthDay(date: Date) {
   return shortMonthDayFormatter.format(date);
 }
@@ -26,4 +34,8 @@ export function formatLongDate(date: Date) {
 
 export function formatMediumDate(date: Date) {
   return mediumDateFormatter.format(date);
+}
+
+export function formatOrderTimestamp(date: Date) {
+  return orderTimestampFormatter.format(date);
 }

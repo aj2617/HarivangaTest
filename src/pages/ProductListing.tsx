@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { useProducts } from '../hooks/useProducts';
 
 export const ProductListing: React.FC = () => {
-  const { products: allProducts } = useProducts();
+  const { products: allProducts, loading } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVariety, setSelectedVariety] = useState('All');
-  const { products, loading } = useProducts({
-    search: searchQuery,
-    variety: selectedVariety,
-  });
+  const normalizedSearch = searchQuery.trim().toLowerCase();
 
-  const varieties = ['All', ...Array.from(new Set(allProducts.map(p => p.variety)))];
+  const products = useMemo(() => {
+    return allProducts.filter((product) => {
+      const matchesSearch =
+        normalizedSearch.length === 0
+        || product.name.toLowerCase().includes(normalizedSearch)
+        || product.variety.toLowerCase().includes(normalizedSearch);
+      const matchesVariety = selectedVariety === 'All' || product.variety === selectedVariety;
+
+      return matchesSearch && matchesVariety;
+    });
+  }, [allProducts, normalizedSearch, selectedVariety]);
+
+  const varieties = useMemo(
+    () => ['All', ...Array.from(new Set(allProducts.map((product) => product.variety)))],
+    [allProducts]
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

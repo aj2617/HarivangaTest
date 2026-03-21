@@ -9,7 +9,7 @@ import { notifyStorefrontProductsChanged } from '../lib/storefrontSync';
 import { optimizeProductUpload } from '../lib/imageOptimization';
 import { getThumbnailImageSrc } from '../lib/imageSources';
 import { BrandLogo } from '../components/BrandLogo';
-import { formatLongDate, formatMediumDate, formatShortMonthDay } from '../lib/dates';
+import { formatLongDate, formatOrderTimestamp, formatShortMonthDay } from '../lib/dates';
 import { 
   LayoutDashboard, Package, ShoppingBag, TrendingUp, 
   Plus, Edit2, Trash2,
@@ -378,17 +378,40 @@ export const AdminDashboard: React.FC = () => {
 
     setLoading(true);
     setErrorMessage(null);
-    void Promise.all([
-      loadOverviewData(),
-      activeTab === 'products' ? loadProductsPage() : Promise.resolve(),
-      activeTab === 'orders' ? loadOrdersPage() : Promise.resolve(),
-    ])
+    void loadOverviewData()
       .catch((error) => {
-        console.error('Failed to load admin data', error);
+        console.error('Failed to load admin overview', error);
         setErrorMessage('Failed to load admin data. Check Supabase tables, policies, and realtime settings.');
       })
       .finally(() => setLoading(false));
-  }, [activeTab, hasAdminAccess, orderDateFilter, orderPage, orderSearchQuery, orderStatusFilter, productPage, productSearchQuery, productStatusFilter, productStockFilter, settingsForm.lowStockThreshold]);
+  }, [hasAdminAccess]);
+
+  useEffect(() => {
+    if (!hasAdminAccess || activeTab === 'overview' || activeTab === 'settings') {
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage(null);
+    void (activeTab === 'products' ? loadProductsPage() : loadOrdersPage())
+      .catch((error) => {
+        console.error(`Failed to load admin ${activeTab}`, error);
+        setErrorMessage('Failed to load admin data. Check Supabase tables, policies, and realtime settings.');
+      })
+      .finally(() => setLoading(false));
+  }, [
+    activeTab,
+    hasAdminAccess,
+    orderDateFilter,
+    orderPage,
+    orderSearchQuery,
+    orderStatusFilter,
+    productPage,
+    productSearchQuery,
+    productStatusFilter,
+    productStockFilter,
+    settingsForm.lowStockThreshold,
+  ]);
 
   useEffect(() => {
     if (!hasAdminAccess) {
@@ -398,7 +421,11 @@ export const AdminDashboard: React.FC = () => {
     const productsChannel = supabase
       .channel('admin-products')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-        void Promise.all([loadOverviewData(), loadProductsPage()]).catch((error) => {
+        if (activeTab !== 'products') {
+          return;
+        }
+
+        void loadProductsPage().catch((error) => {
           console.error('Failed to refresh admin products', error);
         });
       })
@@ -407,9 +434,15 @@ export const AdminDashboard: React.FC = () => {
     const ordersChannel = supabase
       .channel('admin-orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        void Promise.all([loadOverviewData(), loadOrdersPage()]).catch((error) => {
-          console.error('Failed to refresh admin orders', error);
+        void loadOverviewData().catch((error) => {
+          console.error('Failed to refresh admin overview', error);
         });
+
+        if (activeTab === 'orders') {
+          void loadOrdersPage().catch((error) => {
+            console.error('Failed to refresh admin orders', error);
+          });
+        }
       })
       .subscribe();
 
@@ -427,7 +460,20 @@ export const AdminDashboard: React.FC = () => {
       void supabase.removeChannel(ordersChannel);
       window.removeEventListener(LOCAL_DEV_ORDERS_UPDATED_EVENT, refreshLocalOrders);
     };
-  }, [hasAdminAccess, isLocalDevBypass, orderDateFilter, orderPage, orderSearchQuery, orderStatusFilter, productPage, productSearchQuery, productStatusFilter, productStockFilter, settingsForm.lowStockThreshold]);
+  }, [
+    activeTab,
+    hasAdminAccess,
+    isLocalDevBypass,
+    orderDateFilter,
+    orderPage,
+    orderSearchQuery,
+    orderStatusFilter,
+    productPage,
+    productSearchQuery,
+    productStatusFilter,
+    productStockFilter,
+    settingsForm.lowStockThreshold,
+  ]);
 
   useEffect(() => {
     setProductPage(1);
@@ -1057,7 +1103,9 @@ export const AdminDashboard: React.FC = () => {
                   <div key={order.id} className="flex flex-col gap-3 rounded-2xl bg-gray-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <p className="font-bold text-mango-dark">#{order.id.slice(-6).toUpperCase()} · {order.customerName}</p>
-                      <p className="text-xs text-gray-500 mt-1">{order.customerPhone} · {order.deliveryArea}</p>
+                      <p className="mt-1 text-xs text-gray-500">{formatOrderTimestamp(new Date(order.createdAt))}</p>
+                      <p className="mt-1 text-xs text-gray-500">Phone: {order.customerPhone}</p>
+                      <p className="mt-1 text-xs text-gray-500">Address: {order.deliveryAddress}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-mango-dark">{formatCurrency(order.total)}</p>
@@ -1368,14 +1416,14 @@ export const AdminDashboard: React.FC = () => {
                       <td className="px-8 py-4">
                         <div className="flex flex-col">
                           <span className="text-xs font-bold text-gray-400">#{order.id.slice(-6).toUpperCase()}</span>
-                          <span className="mt-1 text-xs text-gray-400">{formatMediumDate(new Date(order.createdAt))}</span>
+                          <span className="mt-1 text-xs text-gray-400">{formatOrderTimestamp(new Date(order.createdAt))}</span>
                         </div>
                       </td>
                       <td className="px-8 py-4">
                         <div className="flex flex-col">
-                          <span className="font-bold text-mango-dark">{order.customerName}</span>
-                          <span className="text-xs text-gray-400">{order.customerPhone}</span>
-                          <span className="mt-1 text-xs text-gray-400">{order.deliveryAddress}</span>
+                          <span className="font-bold text-mango-dark">Name: {order.customerName}</span>
+                          <span className="text-xs text-gray-400">Phone: {order.customerPhone}</span>
+                          <span className="mt-1 text-xs text-gray-400">Address: {order.deliveryAddress}</span>
                         </div>
                       </td>
                       <td className="px-8 py-4">
@@ -1427,7 +1475,7 @@ export const AdminDashboard: React.FC = () => {
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Order ID</p>
                       <p className="font-bold text-mango-dark">#{order.id.slice(-6).toUpperCase()}</p>
-                      <p className="mt-1 text-xs text-gray-400">{formatMediumDate(new Date(order.createdAt))}</p>
+                      <p className="mt-1 text-xs text-gray-400">{formatOrderTimestamp(new Date(order.createdAt))}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getOrderStatusClasses(order.status)}`}>
                       {order.status}
@@ -1435,9 +1483,9 @@ export const AdminDashboard: React.FC = () => {
                   </div>
 
                   <div className="mt-4 rounded-2xl bg-gray-50 px-4 py-3">
-                    <p className="font-bold text-mango-dark">{order.customerName}</p>
-                    <p className="text-sm text-gray-500">{order.customerPhone}</p>
-                    <p className="mt-1 text-sm text-gray-500">{order.deliveryAddress}</p>
+                    <p className="font-bold text-mango-dark">Name: {order.customerName}</p>
+                    <p className="text-sm text-gray-500">Phone: {order.customerPhone}</p>
+                    <p className="mt-1 text-sm text-gray-500">Address: {order.deliveryAddress}</p>
                   </div>
 
                   <div className="mt-4">

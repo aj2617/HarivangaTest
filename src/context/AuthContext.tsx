@@ -77,10 +77,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
           }
 
-          const { mapUserProfileRow, mapUserProfileToRow, supabase } = await loadSupabaseModule();
+          const { mapUserProfileRow, mapUserProfileToRow, supabase, USER_PROFILE_SELECT } = await loadSupabaseModule();
           const { data: existingProfileRow, error: profileError } = await supabase
             .from('users')
-            .select('*')
+            .select(USER_PROFILE_SELECT)
             .eq('id', authUser.id)
             .maybeSingle();
 

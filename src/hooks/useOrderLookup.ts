@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { mapOrderRow, supabase } from '../supabase';
+import { mapOrderRow, ORDER_SELECT, supabase } from '../supabase';
 import { getLocalDevOrderById } from '../lib/localDevOrders';
 import { getRecentOrderById } from '../lib/recentOrders';
 import { hasSupabaseConfig } from '../lib/env';
@@ -56,7 +56,7 @@ export function useOrderLookup({ orderId, userId, isAdmin = false }: UseOrderLoo
 
         let query = supabase
           .from('orders')
-          .select('*')
+          .select(ORDER_SELECT)
           .eq('id', orderId);
 
         if (!isAdmin && userId) {

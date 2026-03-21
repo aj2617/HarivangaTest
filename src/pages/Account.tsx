@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   getAuthErrorMessage,
   mapOrderRow,
+  ORDER_SELECT,
   signInWithEmail,
   signOutUser,
   signUpWithEmail,
@@ -126,10 +127,11 @@ export const Account: React.FC = () => {
       if (!canUseLocalOrderFallback()) {
         const { data, error } = await supabase
           .from('orders')
-          .select('*')
+          .select(ORDER_SELECT)
           .eq('user_id', user!.id)
           .eq('customer_phone_normalized', normalizedPhone)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(1);
 
         if (error) {
           throw error;
@@ -141,9 +143,9 @@ export const Account: React.FC = () => {
         });
       }
 
-      const nextOrders = Array.from(orderMap.values()).sort(
-        (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-      ).slice(0, 1);
+      const nextOrders = Array.from(orderMap.values())
+        .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+        .slice(0, 1);
 
       setOrders(nextOrders);
     } catch (error) {

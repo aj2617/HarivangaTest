@@ -135,3 +135,5 @@ with check (
 create index if not exists orders_customer_phone_idx on public.orders (customer_phone);
 create index if not exists orders_customer_phone_normalized_idx on public.orders (customer_phone_normalized);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
+create index if not exists orders_user_phone_created_at_idx
+on public.orders (user_id, customer_phone_normalized, created_at desc);
