@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Star, MapPin } from 'lucide-react';
+import { ShoppingCart, Star, MapPin, Image as ImageIcon } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../lib/format';
@@ -12,6 +12,21 @@ interface ProductCardProps {
 
 const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
+  const [showDelayedPlaceholder, setShowDelayedPlaceholder] = useState(false);
+
+  useEffect(() => {
+    setImageLoaded(false);
+    setImageFailed(false);
+    setShowDelayedPlaceholder(false);
+
+    const timeout = window.setTimeout(() => {
+      setShowDelayedPlaceholder(true);
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [product.id, product.image]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -29,15 +44,41 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group card-hover-lift rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-xl">
       <Link to={`/product/${product.id}`} className="block relative aspect-square overflow-hidden">
+        {(imageFailed || (!imageLoaded && showDelayedPlaceholder)) && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#fff4de] via-[#fffaf1] to-[#f4ede1]" />
+            <div className="absolute inset-0 transition-opacity duration-300 opacity-100">
+              <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-4 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/80 text-mango-orange shadow-sm">
+                  <ImageIcon size={24} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-mango-dark">{product.name}</p>
+                  <p className="mt-1 text-xs text-gray-500">{imageFailed ? 'Image unavailable' : 'Loading product photo...'}</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
         <img
           src={getThumbnailImageSrc(product.image)}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imageLoaded && !imageFailed ? 'opacity-100' : imageFailed ? 'opacity-0' : 'opacity-100'}`}
           loading="lazy"
           decoding="async"
           width={320}
           height={320}
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          onLoad={() => {
+            setImageLoaded(true);
+            setImageFailed(false);
+            setShowDelayedPlaceholder(false);
+          }}
+          onError={() => {
+            setImageLoaded(false);
+            setImageFailed(true);
+            setShowDelayedPlaceholder(true);
+          }}
         />
         {!product.isAvailable && (
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">

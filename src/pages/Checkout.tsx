@@ -196,20 +196,20 @@ export const Checkout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
           <div className="lg:col-span-2">
-            <div className="fade-up-enter bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-black mb-8 flex items-center gap-3">
-                <div className="w-10 h-10 bg-mango-orange/10 text-mango-orange rounded-xl flex items-center justify-center">
+            <div className="fade-up-enter rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-8">
+              <h2 className="mb-6 flex items-center gap-3 text-xl font-black sm:mb-8 sm:text-2xl">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-mango-orange/10 text-mango-orange sm:h-10 sm:w-10">
                   <Truck size={20} />
                 </div>
                 Delivery Details
               </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
                       <UserIcon size={14} /> Full Name
@@ -238,14 +238,14 @@ export const Checkout: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-gray-100 bg-gray-50/70 p-5 sm:p-6">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 bg-mango-orange/10 text-mango-orange rounded-xl flex items-center justify-center">
+                <div className="rounded-3xl border border-gray-100 bg-gray-50/70 p-4 sm:p-6">
+                  <div className="mb-4 flex items-center gap-3 sm:mb-5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-mango-orange/10 text-mango-orange sm:h-10 sm:w-10">
                       <LocateFixed size={18} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-black text-mango-dark">Delivery Location</h3>
-                      <p className="text-sm text-gray-500">Select division and district before choosing delivery method.</p>
+                      <h3 className="text-base font-black text-mango-dark sm:text-lg">Delivery Location</h3>
+                      <p className="text-xs text-gray-500 sm:text-sm">Select division and district before choosing delivery method.</p>
                     </div>
                   </div>
 
@@ -285,7 +285,7 @@ export const Checkout: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="mt-5 space-y-2">
+                  <div className="mt-4 space-y-2 sm:mt-5">
                     <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
                       <MapPin size={14} /> Full Delivery Address
                     </label>
@@ -299,24 +299,24 @@ export const Checkout: React.FC = () => {
                     />
                   </div>
 
-                  <div className="mt-5">
+                  <div className="mt-4 sm:mt-5">
                     <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2 mb-3">
                       <Truck size={14} /> Delivery Method
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                       {(['Home Delivery', 'Courier Pickup'] as const).map((method) => (
                         <button
                           key={method}
                           type="button"
                           onClick={() => setFormData({ ...formData, deliveryMethod: method })}
-                          className={`rounded-2xl border-2 px-4 py-4 text-left transition-all ${
+                          className={`rounded-xl border-2 px-3 py-2.5 text-left transition-all sm:rounded-2xl sm:px-4 sm:py-3 ${
                             formData.deliveryMethod === method
                               ? 'border-mango-orange bg-mango-orange/5 shadow-md'
                               : 'border-gray-200 bg-white'
                           }`}
                         >
-                          <p className="font-black text-mango-dark">{method}</p>
-                          <p className="mt-1 text-sm text-gray-500">
+                          <p className="text-base font-black text-mango-dark sm:text-lg">{method}</p>
+                          <p className="mt-1 text-[13px] leading-snug text-gray-500 sm:text-sm">
                             {method === 'Home Delivery'
                               ? 'Delivered to the exact address selected above.'
                               : 'Pickup from courier point in the selected district.'}
@@ -334,26 +334,26 @@ export const Checkout: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-8">
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-mango-orange/10 text-mango-orange rounded-xl flex items-center justify-center">
+                <div className="pt-5 sm:pt-8">
+                  <h3 className="mb-4 flex items-center gap-3 text-lg font-bold sm:mb-6 sm:text-xl">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-mango-orange/10 text-mango-orange sm:h-10 sm:w-10">
                       <CreditCard size={20} />
                     </div>
                     Payment Method
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
                     {(['bKash', 'Nagad', 'Cash on Delivery'] as const).map((method) => (
                       <button
                         key={method}
                         type="button"
                         onClick={() => setFormData({ ...formData, paymentMethod: method })}
-                        className={`p-4 rounded-2xl border-2 text-sm font-bold transition-all flex flex-col items-center gap-2 ${
+                        className={`min-w-0 rounded-xl border-2 px-2 py-2 text-[12px] font-bold transition-all flex flex-col items-center justify-center gap-1 text-center sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm sm:gap-1.5 ${
                           formData.paymentMethod === method
                             ? 'border-mango-orange bg-mango-orange/5 text-mango-orange shadow-md'
                             : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'
                         }`}
                       >
-                        {method === 'Cash on Delivery' ? <Truck size={24} /> : <CreditCard size={24} />}
+                        {method === 'Cash on Delivery' ? <Truck size={18} className="sm:h-5 sm:w-5" /> : <CreditCard size={18} className="sm:h-5 sm:w-5" />}
                         {method}
                       </button>
                     ))}
@@ -363,7 +363,7 @@ export const Checkout: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting || cart.length === 0}
-                  className="w-full mt-12 bg-mango-orange text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-mango-orange/20 hover:bg-mango-orange/90 transition-all disabled:bg-gray-200 disabled:shadow-none"
+                  className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-mango-orange py-4 text-base font-black text-white shadow-xl shadow-mango-orange/20 transition-all hover:bg-mango-orange/90 disabled:bg-gray-200 disabled:shadow-none sm:mt-12 sm:py-5 sm:text-lg"
                 >
                   {isSubmitting ? 'Processing Order...' : `Place Order - ${formatCurrency(subtotal + deliveryCharge)}`}
                 </button>
@@ -377,9 +377,9 @@ export const Checkout: React.FC = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 sticky top-24">
-              <h3 className="text-xl font-bold mb-6">Order Summary</h3>
-              <div className="space-y-4 mb-8 max-h-60 overflow-y-auto pr-2">
+            <div className="sticky top-24 rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-8">
+              <h3 className="mb-5 text-lg font-bold sm:mb-6 sm:text-xl">Order Summary</h3>
+              <div className="mb-6 max-h-60 space-y-3 overflow-y-auto pr-2 sm:mb-8 sm:space-y-4">
                 {cart.map((item) => (
                   <div key={`${item.productId}-${item.variant}`} className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-3">
@@ -398,12 +398,12 @@ export const Checkout: React.FC = () => {
                 ))}
               </div>
 
-              <div className="rounded-2xl bg-gray-50 px-4 py-4 mb-6">
+              <div className="mb-5 rounded-2xl bg-gray-50 px-4 py-3 sm:mb-6 sm:py-4">
                 <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Delivery Destination</p>
                 <p className="mt-2 text-sm font-bold text-mango-dark">{deliveryAreaLabel}</p>
               </div>
 
-              <div className="space-y-3 pt-6 border-t border-gray-100">
+              <div className="space-y-3 border-t border-gray-100 pt-5 sm:pt-6">
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>Subtotal</span>
                   <span className="font-bold text-mango-dark">{formatCurrency(subtotal)}</span>
@@ -413,12 +413,12 @@ export const Checkout: React.FC = () => {
                   <span className="font-bold text-mango-dark">{formatCurrency(deliveryCharge)}</span>
                 </div>
                 <div className="pt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold">Total</span>
-                  <span className="text-2xl font-black text-mango-orange">{formatCurrency(subtotal + deliveryCharge)}</span>
+                  <span className="text-base font-bold sm:text-lg">Total</span>
+                  <span className="text-xl font-black text-mango-orange sm:text-2xl">{formatCurrency(subtotal + deliveryCharge)}</span>
                 </div>
               </div>
 
-              <div className="mt-8 p-4 bg-orange-50 rounded-2xl flex items-start gap-3">
+              <div className="mt-6 flex items-start gap-3 rounded-2xl bg-orange-50 p-3.5 sm:mt-8 sm:p-4">
                 <CheckCircle2 size={16} className="text-mango-orange shrink-0 mt-0.5" />
                 <p className="text-[10px] text-mango-orange font-medium leading-relaxed">
                   By placing this order, you agree to our terms of service and delivery policy.

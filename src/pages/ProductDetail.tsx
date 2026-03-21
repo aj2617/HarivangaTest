@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { getCachedStorefrontProducts } from '../hooks/useProducts';
 import { fetchStorefrontProductById } from '../lib/publicProducts';
 import { hasSupabaseConfig } from '../lib/env';
 import { formatCurrency } from '../lib/format';
@@ -50,7 +51,14 @@ export const ProductDetail: React.FC = () => {
     };
 
     const controller = new AbortController();
-    setProductLoading(true);
+    const cachedProduct = getCachedStorefrontProducts().find((entry) => entry.id === id);
+
+    if (cachedProduct) {
+      setProduct(cachedProduct);
+      setProductLoading(false);
+    } else {
+      setProductLoading(true);
+    }
 
     const loadProduct = async () => {
       if (!hasSupabaseConfig) {

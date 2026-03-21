@@ -72,8 +72,7 @@ const getYoutubeEmbedUrl = (url: string): string | null => {
 const isDirectVideoFile = (url: string): boolean => /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
 
 export const Home: React.FC = () => {
-  const { products } = useProducts();
-  const featuredProducts = products.slice(0, 4);
+  const { products: featuredProducts } = useProducts({ limit: 4 });
   const [promotion, setPromotion] = useState<HomePromotion>(DEFAULT_HOME_PROMOTION);
   const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
 

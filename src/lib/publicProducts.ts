@@ -18,7 +18,10 @@ type ProductRow = {
 type StorefrontProductFilters = {
   search?: string;
   variety?: string;
+  limit?: number;
 };
+
+const requestCache = new Map<string, Promise<ProductRow[]>>();
 
 const STOREFRONT_PRODUCT_SELECT =
   'id,name,image,price_per_kg,stock,variety,origin,is_available,variants';
@@ -57,20 +60,37 @@ export function mapPublicProductRow(row: ProductRow): Product {
 }
 
 async function requestProducts(query: string, signal?: AbortSignal) {
+  if (!signal) {
+    const cachedRequest = requestCache.get(query);
+    if (cachedRequest) {
+      return cachedRequest;
+    }
+  }
+
   const { supabaseUrl, supabaseAnonKey } = getSupabaseRestConfig();
-  const response = await fetch(`${supabaseUrl}/rest/v1/products?${query}`, {
+  const request = fetch(`${supabaseUrl}/rest/v1/products?${query}`, {
     headers: {
       apikey: supabaseAnonKey,
       Authorization: `Bearer ${supabaseAnonKey}`,
     },
     signal,
-  });
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to load products (${response.status})`);
+      }
 
-  if (!response.ok) {
-    throw new Error(`Failed to load products (${response.status})`);
+      return response.json() as Promise<ProductRow[]>;
+    })
+    .finally(() => {
+      requestCache.delete(query);
+    });
+
+  if (!signal) {
+    requestCache.set(query, request);
   }
 
-  return response.json();
+  return request;
 }
 
 export async function fetchStorefrontProducts(filters?: StorefrontProductFilters, signal?: AbortSignal) {
@@ -86,6 +106,10 @@ export async function fetchStorefrontProducts(filters?: StorefrontProductFilters
   const variety = filters?.variety?.trim();
   if (variety && variety !== 'All') {
     params.set('variety', `eq.${variety}`);
+  }
+
+  if (filters?.limit && filters.limit > 0) {
+    params.set('limit', String(filters.limit));
   }
 
   const rows = (await requestProducts(params.toString(), signal)) as ProductRow[];

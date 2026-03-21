@@ -8,6 +8,8 @@ type AdminProductModalProps = {
   productForm: Partial<Product>;
   productOrigins: readonly string[];
   productImagesInputRef: React.RefObject<HTMLInputElement | null>;
+  isSubmitting: boolean;
+  submitError: string | null;
   onClose: () => void;
   onSubmit: (event: React.FormEvent) => void;
   onChange: (next: Partial<Product>) => void;
@@ -24,6 +26,8 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
   productForm,
   productOrigins,
   productImagesInputRef,
+  isSubmitting,
+  submitError,
   onClose,
   onSubmit,
   onChange,
@@ -40,7 +44,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
       <div className="relative max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl">
         <div className="flex items-center justify-between gap-4 border-b border-gray-100 p-5 sm:p-8">
           <h2 className="text-xl font-black sm:text-2xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-          <button onClick={onClose} className="rounded-full p-2 transition-colors hover:bg-gray-100">
+          <button type="button" onClick={onClose} disabled={isSubmitting} className="rounded-full p-2 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40">
             <X size={24} />
           </button>
         </div>
@@ -214,12 +218,18 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
             )}
           </div>
 
+          {submitError && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {submitError}
+            </div>
+          )}
+
           <div className="flex gap-4 border-t border-gray-100 pt-6">
-            <button type="button" onClick={onClose} className="flex-grow rounded-2xl py-4 font-bold text-gray-400 transition-all hover:bg-gray-50">
+            <button type="button" onClick={onClose} disabled={isSubmitting} className="flex-grow rounded-2xl py-4 font-bold text-gray-400 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40">
               Cancel
             </button>
-            <button type="submit" className="flex flex-grow items-center justify-center gap-2 rounded-2xl bg-mango-orange py-4 font-bold text-white shadow-xl shadow-mango-orange/20 transition-all hover:bg-mango-orange/90">
-              <Save size={20} /> {editingProduct ? 'Update Product' : 'Create Product'}
+            <button type="submit" disabled={isSubmitting} className="flex flex-grow items-center justify-center gap-2 rounded-2xl bg-mango-orange py-4 font-bold text-white shadow-xl shadow-mango-orange/20 transition-all hover:bg-mango-orange/90 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none">
+              <Save size={20} /> {isSubmitting ? (editingProduct ? 'Updating...' : 'Creating...') : editingProduct ? 'Update Product' : 'Create Product'}
             </button>
           </div>
         </form>

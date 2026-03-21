@@ -229,6 +229,8 @@ export const AdminDashboard: React.FC = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productForm, setProductForm] = useState<Partial<Product>>(createEmptyProductForm);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [productSubmitError, setProductSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!settingsSavedMessage) return;
@@ -506,6 +508,12 @@ export const AdminDashboard: React.FC = () => {
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSavingProduct) {
+      return;
+    }
+
+    setIsSavingProduct(true);
+    setProductSubmitError(null);
     const sanitizedVariants = (productForm.variants ?? [])
       .map((variant) => ({
         weight: variant.weight.trim(),
@@ -529,6 +537,7 @@ export const AdminDashboard: React.FC = () => {
     };
 
     if (isLocalDevBypass) {
+      const allExistingProducts = await getLocalDevProducts();
       const nextProduct: Product = {
         id: editingProduct?.id ?? `local-product-${Date.now()}`,
         name: sanitizedProductForm.name ?? '',
@@ -544,19 +553,15 @@ export const AdminDashboard: React.FC = () => {
         variants: sanitizedProductForm.variants ?? [{ ...DEFAULT_PRODUCT_VARIANT }],
       };
 
-      setProducts((current) =>
-        {
-          const nextProducts = editingProduct
-            ? current.map((product) => (product.id === editingProduct.id ? nextProduct : product))
-            : [...current, nextProduct];
-          setLocalDevProducts(nextProducts);
-          notifyStorefrontProductsChanged();
-          return nextProducts;
-        }
-      );
-      setIsProductModalOpen(false);
-      setEditingProduct(null);
-      setProductForm(createEmptyProductForm());
+      const nextProducts = editingProduct
+        ? allExistingProducts.map((product) => (product.id === editingProduct.id ? nextProduct : product))
+        : [...allExistingProducts, nextProduct];
+
+      setLocalDevProducts(nextProducts);
+      notifyStorefrontProductsChanged();
+      await loadProductsPage();
+      resetProductModal();
+      setIsSavingProduct(false);
       return;
     }
 
@@ -581,7 +586,11 @@ export const AdminDashboard: React.FC = () => {
       notifyStorefrontProductsChanged();
       resetProductModal();
     } catch (error) {
+      const nextMessage = error instanceof Error ? error.message : 'Could not save the product.';
+      setProductSubmitError(nextMessage);
       handleDatabaseError(error, OperationType.WRITE, 'products');
+    } finally {
+      setIsSavingProduct(false);
     }
   };
 
@@ -757,6 +766,8 @@ export const AdminDashboard: React.FC = () => {
     setIsProductModalOpen(false);
     setEditingProduct(null);
     setProductForm(createEmptyProductForm());
+    setProductSubmitError(null);
+    setIsSavingProduct(false);
   };
 
   const handleAdminLogin = async (event: React.FormEvent) => {
@@ -1134,6 +1145,7 @@ export const AdminDashboard: React.FC = () => {
                 onClick={() => {
                   setEditingProduct(null);
                   setProductForm(createEmptyProductForm());
+                  setProductSubmitError(null);
                   setIsProductModalOpen(true);
                 }}
                 className="w-full sm:w-auto bg-mango-orange text-white px-6 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-mango-orange/20"
@@ -1234,6 +1246,7 @@ export const AdminDashboard: React.FC = () => {
                             onClick={() => {
                               setEditingProduct(product);
                               setProductForm(buildProductForm(product));
+                              setProductSubmitError(null);
                               setIsProductModalOpen(true);
                             }}
                             className="p-2 text-gray-400 hover:text-mango-orange transition-colors"
@@ -1300,6 +1313,7 @@ export const AdminDashboard: React.FC = () => {
                           onClick={() => {
                             setEditingProduct(product);
                             setProductForm(buildProductForm(product));
+                            setProductSubmitError(null);
                             setIsProductModalOpen(true);
                           }}
                           className="flex-1 rounded-2xl bg-mango-orange/10 px-4 py-3 text-sm font-bold text-mango-orange"
@@ -1585,12 +1599,22 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Product Modal */}
       {isProductModalOpen && (
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-mango-dark/60 backdrop-blur-sm" />
+            <div className="relative w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-2xl">
+              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-mango-orange" />
+              <p className="mt-4 text-sm font-bold text-mango-dark">Loading product form...</p>
+            </div>
+          </div>
+        }>
           <AdminProductModal
             editingProduct={editingProduct}
             productForm={productForm}
             productOrigins={PRODUCT_ORIGINS}
             productImagesInputRef={productImagesInputRef}
+            isSubmitting={isSavingProduct}
+            submitError={productSubmitError}
             onClose={resetProductModal}
             onSubmit={handleSaveProduct}
             onChange={setProductForm}

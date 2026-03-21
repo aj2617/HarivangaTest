@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   getLocalDevProducts,
+  getMockProducts,
   isLocalDevAdminMode,
   LOCAL_DEV_PRODUCTS_UPDATED_EVENT,
 } from '../lib/localDevProducts';
@@ -17,6 +18,7 @@ const memoryCache = new Map<string, { products: Product[]; timestamp: number }>(
 type UseProductsOptions = {
   search?: string;
   variety?: string;
+  limit?: number;
 };
 
 function readStorageCache(key: string) {
@@ -66,16 +68,21 @@ function writeCachedProducts(products: Product[]) {
   }
 }
 
-function getCacheKey(search: string, variety: string) {
-  return JSON.stringify(['storefront-products', search, variety]);
+function getCacheKey(search: string, variety: string, limit?: number) {
+  return JSON.stringify(['storefront-products', search, variety, limit ?? null]);
+}
+
+export function getCachedStorefrontProducts() {
+  return readCachedProducts() ?? [];
 }
 
 export function useProducts(options?: UseProductsOptions) {
   const localDevMode = isLocalDevAdminMode();
   const search = options?.search?.trim() ?? '';
   const variety = options?.variety?.trim() ?? '';
-  const isDefaultQuery = search.length === 0 && variety.length === 0;
-  const cacheKey = getCacheKey(search, variety);
+  const limit = options?.limit;
+  const isDefaultQuery = search.length === 0 && variety.length === 0 && limit == null;
+  const cacheKey = getCacheKey(search, variety, limit);
   const [products, setProducts] = useState<Product[]>(() => {
     if (isDefaultQuery) {
       return readCachedProducts() ?? [];
@@ -89,11 +96,40 @@ export function useProducts(options?: UseProductsOptions) {
   useEffect(() => {
     let cancelled = false;
 
+    const applyFallbackProducts = async () => {
+      const fallbackProducts = await getMockProducts();
+
+      if (cancelled) {
+        return;
+      }
+
+      const filteredFallbackProducts = fallbackProducts.filter((product) => {
+        const matchesSearch =
+          search.length === 0
+          || product.name.toLowerCase().includes(search.toLowerCase())
+          || product.variety.toLowerCase().includes(search.toLowerCase());
+        const matchesVariety = variety.length === 0 || variety === 'All' || product.variety === variety;
+
+        return matchesSearch && matchesVariety;
+      });
+
+      const limitedFallbackProducts = typeof limit === 'number'
+        ? filteredFallbackProducts.slice(0, limit)
+        : filteredFallbackProducts;
+
+      memoryCache.set(cacheKey, { products: limitedFallbackProducts, timestamp: Date.now() });
+      if (isDefaultQuery) {
+        writeCachedProducts(limitedFallbackProducts);
+      }
+
+      setProducts(limitedFallbackProducts);
+      setError(null);
+      setLoading(false);
+    };
+
     const loadProducts = async (forceRefresh = false) => {
       if (!localDevMode && !hasSupabaseConfig) {
-        setProducts([]);
-        setLoading(false);
-        setError('Store configuration is incomplete.');
+        await applyFallbackProducts();
         return;
       }
 
@@ -127,9 +163,14 @@ export function useProducts(options?: UseProductsOptions) {
       setError(null);
 
       try {
-        const nextProducts = await fetchStorefrontProducts({ search, variety });
+        const nextProducts = await fetchStorefrontProducts({ search, variety, limit });
 
         if (cancelled) {
+          return;
+        }
+
+        if (nextProducts.length === 0) {
+          await applyFallbackProducts();
           return;
         }
 
@@ -140,10 +181,7 @@ export function useProducts(options?: UseProductsOptions) {
         setProducts(nextProducts);
       } catch (fetchError) {
         console.error('Could not load storefront products.', fetchError);
-        if (!cancelled) {
-          setProducts([]);
-          setError('Could not load the product catalog.');
-        }
+        await applyFallbackProducts();
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -178,7 +216,7 @@ export function useProducts(options?: UseProductsOptions) {
       cancelled = true;
       window.removeEventListener(STOREFRONT_PRODUCTS_CHANGED_EVENT, handleRefresh);
     };
-  }, [cacheKey, isDefaultQuery, localDevMode, search, variety]);
+  }, [cacheKey, isDefaultQuery, limit, localDevMode, search, variety]);
 
   return {
     products,
