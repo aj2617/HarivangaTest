@@ -64,7 +64,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-4 pl-2">
             <button onClick={() => navigate('/cart')} className="p-2 relative">
               <ShoppingCart size={20} />
               {totalItems > 0 && (

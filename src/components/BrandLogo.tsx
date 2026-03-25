@@ -9,19 +9,19 @@ type BrandLogoProps = {
 
 const SIZE_CLASSES = {
   sm: {
-    wrap: 'gap-2',
+    wrap: 'gap-1.5',
     icon: 'h-8 w-8',
     name: 'text-xl',
     dotCom: 'text-xs -mt-1',
   },
   md: {
-    wrap: 'gap-3',
+    wrap: 'gap-1.5',
     icon: 'h-10 w-10',
     name: 'text-2xl',
     dotCom: 'text-sm -mt-1',
   },
   lg: {
-    wrap: 'gap-3',
+    wrap: 'gap-2',
     icon: 'h-12 w-12',
     name: 'text-3xl',
     dotCom: 'text-base -mt-1',
@@ -31,7 +31,7 @@ const SIZE_CLASSES = {
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
   dark = true,
-  showDotComBelow = true,
+  showDotComBelow = false,
 }) => {
   const classes = SIZE_CLASSES[size];
   const textColor = dark ? 'text-mango-dark' : 'text-white';
@@ -46,11 +46,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         className={`${classes.icon} shrink-0 object-contain`}
       />
 
-      <div className="leading-none">
+      <div className={showDotComBelow ? 'leading-none' : 'flex items-baseline gap-0.5 leading-none'}>
         <div className={`font-black tracking-tight ${classes.name} ${textColor}`}>Harivanga</div>
-        {showDotComBelow && (
-          <div className={`font-black text-right ${classes.dotCom} ${dotComColor}`}>.com</div>
-        )}
+        <div className={`font-black ${showDotComBelow ? `text-right ${classes.dotCom}` : classes.dotCom} ${dotComColor}`}>
+          .com
+        </div>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export const AnnouncementBar: React.FC = () => {
             rel="noreferrer"
             className="inline-flex items-center gap-2 font-semibold text-mango-yellow hover:text-white transition-colors"
           >
-            <Facebook size={14} />
+            <Facebook size={18} />
             Follow on Facebook
           </a>
         </div>

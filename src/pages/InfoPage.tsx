@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ArrowRight, Clock3, Leaf, MapPin, ShieldCheck, Sprout, SunMedium, Truck, Trophy } from 'lucide-react';
 
@@ -17,28 +17,33 @@ type InfoPageContent = {
 
 const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
   '/about': {
-    eyebrow: 'হরিভাঙ্গার গল্প',
+    eyebrow: 'হাড়িভাঙ্গার গল্প',
     title: 'আমাদের গল্প',
-    intro: 'Harivanga.com পদাগঞ্জের আসল বাগান থেকে গাছপাকা, রাসায়নিকমুক্ত হরিভাঙ্গা সংগ্রহ করে সরাসরি গ্রাহকের ঘরে পৌঁছে দেয়। আমাদের লক্ষ্য একটাই — রংপুরের লাল মাটির সেই অনন্য স্বাদ কোনো আপোস ছাড়া পৌঁছে দেওয়া।',
-    highlights: ['পদাগঞ্জের আসল বাগান', 'গাছপাকা ও রাসায়নিকমুক্ত', 'সরাসরি দরজায় ডেলিভারি'],
+    intro:
+      'Harivanga.com রংপুরের বিখ্যাত মিঠাপুকুর থানার পদাগঞ্জের লাল মাটির নিজস্ব বাগান থেকে, সম্পুর্ন ক্যামিকেল মুক্ত, সতেজ, গার্ডেনফ্রেশ হাড়িভাঙ্গা আমগুলো সংগ্রহ করে সরাসরি গ্রাহকের ঘরে পৌঁছে দেয়। আমাদের লক্ষ্য একটাই — রংপুরের লাল মাটির সেই অনন্য স্বাদ কোনো আপোস ছাড়া পৌঁছে দেওয়া।',
+    highlights: ['পদাগঞ্জের নিজস্ব বাগান', 'ক্যামিকেল মুক্ত ও সতেজ', 'সরাসরি গ্রাহকের ঘরে ডেলিভারি'],
     sections: [
       {
         heading: 'শুরুর গল্প',
-        body: 'রংপুরের মিঠাপুকুর উপজেলার পদাগঞ্জের খোরাগাছ ইউনিয়নের তেকানি গ্রামে বহু বছর আগে নাফাল উদ্দিন পাইকার তাঁর জমিতে একটি আমগাছের চারা রোপণ করেন। প্রতিকূল মাটি, তীব্র রোদ আর খরার মধ্যেও তিনি বিশেষ ব্যবস্থায় গাছের গোড়ায় ধীরে ধীরে পানি দিতেন। সেই যত্নের ফলেই জন্ম নেয় এমন এক আম, যার স্বাদ, ঘ্রাণ ও রসালত্ব গ্রামবাসীকে প্রথম ফলনেই বিস্মিত করেছিল।'
+        body:
+          'রংপুরের মিঠাপুকুর উপজেলার, খোড়াগাছ ইউনিয়নের, পদাগন্জের তেকানির মোড় গ্রামে বহু বছর আগে (মো: নাফাল উদ্দিন পাইকার) তাঁর জমিতে একটি আমগাছের চারা রোপণ করেন। প্রতিকূল মাটি, তীব্র রোদ আর খরার মধ্যেও তিনি বিশেষ ব্যবস্থায় গাছের গোড়ায় ধীরে ধীরে পানি দিতেন। সেই যত্নের ফলেই জন্ম নেয় এমন একটি পরিপূর্ণ আমগাছ। সেই গাছ থেকে ফল আসে, যার স্বাদ, ঘ্রাণ ও রসালত্ব গ্রামবাসীকে প্রথম ফলনেই বিস্মিত করেছিল। সেটিই ছিল বিখ্যাত হাড়িভাঙ্গা আম। যেটি কী না হাঁড়িতে পরে হাঁড়িকে ভেঙ্গে দিয়েছিল। সেই থেকে এর প্রচলন চলমান।',
       },
       {
         heading: 'লাল মাটির স্বাদ',
-        body: 'পদাগঞ্জের খনিজসমৃদ্ধ লাল মাটি, রংপুরের আবহাওয়া, মৌসুমি বৃষ্টি এবং ধীর প্রাকৃতিক পাকার প্রক্রিয়া হরিভাঙ্গাকে দিয়েছে আলাদা পরিচয়। এই আমে কোনো কৃত্রিম রঙ বা রাসায়নিক পাকানোর প্রয়োজন হয় না। গাছেই ধীরে ধীরে পাকে, আর পাকলে খোসায় ফুটে ওঠে হালকা লালচে আভা — যেন মাটির নিজস্ব রঙ ফলের গায়ে এসে বসে।'
+        body:
+          'পদাগঞ্জের খনিজসমৃদ্ধ লাল মাটি, রংপুরের আবহাওয়া, মৌসুমি বৃষ্টি এবং ধীর প্রাকৃতিক পাকার প্রক্রিয়া হাড়িভাঙ্গাকে দিয়েছে আলাদা পরিচয়। এই আমে কোনো কৃত্রিম রঙ বা রাসায়নিক পাকানোর প্রয়োজন হয় না। গাছেই ধীরে ধীরে পাকে, আর পাকলে খোসায় ফুটে ওঠে হালকা লালচে আভা।',
       },
       {
         heading: 'বাংলাদেশের গর্ব',
-        body: 'হরিভাঙ্গা আজ শুধু একটি ফল নয়, এটি উত্তরবঙ্গের কৃষি ঐতিহ্য ও গর্বের প্রতীক। ভৌগোলিক নির্দেশক (GI) স্বীকৃত এই আমের জন্য মৌসুমে দেশের বিভিন্ন অঞ্চল থেকে পাইকাররা পদাগঞ্জে ছুটে আসেন। বিশেষ করে আম মৌসুমের শেষভাগে, যখন অন্যান্য জাতের আম কমে আসে, তখন হরিভাঙ্গা আসে সেরা বিদায়ী উপহার হয়ে।'
+        body:
+          'হাড়িভাঙ্গা আজ শুধু একটি ফল নয়, এটি উত্তরবঙ্গের কৃষি ঐতিহ্য ও গর্বের প্রতীক। ভৌগোলিক নির্দেশক (GI) স্বীকৃত এই আমের জন্য মৌসুমে দেশের বিভিন্ন অঞ্চল থেকে পাইকাররা পদাগঞ্জে ছুটে আসেন। বিশেষ করে মৌসুমের শেষভাগে হাড়িভাঙ্গা আসে সেরা বিদায়ী উপহার হয়ে।',
       },
       {
         heading: 'Harivanga.com-এর প্রতিশ্রুতি',
-        body: 'আমরা পদাগঞ্জের বিশ্বস্ত বাগান থেকে বাছাই করা হরিভাঙ্গা সংগ্রহ করি, যাতে মধ্যস্বত্বভোগীর কারণে মান বা সতেজতায় কোনো ঘাটতি না থাকে। প্রতিটি চালানে আমরা গুরুত্ব দিই আসল স্বাদ, নিরাপদ সংগ্রহ, এবং গ্রাহকের হাতে সর্বোচ্চ মানের হরিভাঙ্গা পৌঁছে দেওয়ায়। কারণ একবার আসল হরিভাঙ্গার স্বাদ পেলে, সেটি ভোলা কঠিন।'
-      }
-    ]
+        body:
+          'আমরা পদাগঞ্জের বিশ্বস্ত বাগান থেকে বাছাই করা হাড়িভাঙ্গা সংগ্রহ করি, যাতে মধ্যস্বত্বভোগীর কারণে মান বা সতেজতায় কোনো ঘাটতি না থাকে। প্রতিটি চালানে আমরা গুরুত্ব দিই আসল স্বাদ, নিরাপদ সংগ্রহ এবং গ্রাহকের হাতে সর্বোচ্চ মানের আম পৌঁছে দেওয়ায়।',
+      },
+    ],
   },
   '/contact': {
     eyebrow: 'Support',
@@ -48,13 +53,13 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
     sections: [
       {
         heading: 'Response time',
-        body: 'Support requests are typically handled within business hours, with faster responses for delivery-day issues.'
+        body: 'Support requests are typically handled within business hours, with faster responses for delivery-day issues.',
       },
       {
         heading: 'Wholesale and partnerships',
-        body: 'For bulk orders or business collaborations, contact the team with expected quantity, location, and delivery timeline. Order requests can be sent to the WhatsApp number listed above.'
-      }
-    ]
+        body: 'For bulk orders or business collaborations, contact the team with expected quantity, location, and delivery timeline. Order requests can be sent to the WhatsApp number listed above.',
+      },
+    ],
   },
   '/shipping': {
     eyebrow: 'Policy',
@@ -64,13 +69,13 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
     sections: [
       {
         heading: 'Delivery areas',
-        body: 'Dhaka orders receive the fastest service. Deliveries outside Dhaka depend on route availability and seasonal volume.'
+        body: 'Dhaka orders receive the fastest service. Deliveries outside Dhaka depend on route availability and seasonal volume.',
       },
       {
         heading: 'Packaging',
-        body: 'Orders are packed to reduce bruising during transport while maintaining airflow appropriate for fresh produce.'
-      }
-    ]
+        body: 'Orders are packed to reduce bruising during transport while maintaining airflow appropriate for fresh produce.',
+      },
+    ],
   },
   '/returns': {
     eyebrow: 'Policy',
@@ -80,13 +85,13 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
     sections: [
       {
         heading: 'When to report',
-        body: 'If fruit arrives damaged or clearly inconsistent with the order, contact support as soon as possible after delivery.'
+        body: 'If fruit arrives damaged or clearly inconsistent with the order, contact support as soon as possible after delivery.',
       },
       {
         heading: 'Resolution options',
-        body: 'Depending on the issue, Harivanga.com may offer replacement, partial refund, or account credit.'
-      }
-    ]
+        body: 'Depending on the issue, Harivanga.com may offer replacement, partial refund, or account credit.',
+      },
+    ],
   },
   '/faq': {
     eyebrow: 'Help',
@@ -96,13 +101,13 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
     sections: [
       {
         heading: 'Are the mangoes naturally ripened?',
-        body: 'Yes. The storefront messaging and sourcing process are built around naturally ripened seasonal fruit.'
+        body: 'Yes. The storefront messaging and sourcing process are built around naturally ripened seasonal fruit.',
       },
       {
         heading: 'Can I preorder for a specific date?',
-        body: 'Yes. The checkout flow already includes a preferred delivery date field for scheduling.'
-      }
-    ]
+        body: 'Yes. The checkout flow already includes a preferred delivery date field for scheduling.',
+      },
+    ],
   },
   '/privacy': {
     eyebrow: 'Policy',
@@ -112,14 +117,14 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
     sections: [
       {
         heading: 'What data is used',
-        body: 'Basic profile details, delivery information, and order history are used to process purchases and improve repeat checkout.'
+        body: 'Basic profile details, delivery information, and order history are used to process purchases and improve repeat checkout.',
       },
       {
         heading: 'How access is limited',
-        body: 'The app uses authenticated access patterns and role-based admin checks to reduce exposure of user records.'
-      }
-    ]
-  }
+        body: 'The app uses authenticated access patterns and role-based admin checks to reduce exposure of user records.',
+      },
+    ],
+  },
 };
 
 const PAGE_ICONS = [Leaf, Truck, ShieldCheck, Clock3];

@@ -31,8 +31,8 @@ export const ProductListing: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
-            <h1 className="text-4xl font-black text-mango-dark mb-2">Shop Fresh Mangoes</h1>
-            <p className="text-gray-500">Discover authentic Harivanga and premium mangoes from Podagonj, Mithapukur, Rangpur.</p>
+            <h1 className="mb-2 font-serif text-3xl font-bold tracking-tight text-mango-dark sm:text-4xl">Shop Fresh Mangoes</h1>
+            <p className="text-sm text-gray-500 sm:text-base">Discover authentic Harivanga and premium mangoes from Podagonj, Mithapukur, Rangpur.</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">

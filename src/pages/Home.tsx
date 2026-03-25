@@ -3,6 +3,15 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, PlayCircle, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { useProducts } from '../hooks/useProducts';
+import slide1 from '../../slide1.jpeg';
+import slide2 from '../../slide2.jpeg';
+import slide3 from '../../slide3.jpeg';
+import slide4 from '../../slide4.jpeg';
+import slide5 from '../../slide5.jpeg';
+import slide6 from '../../slide6.jpeg';
+import slide7 from '../../slide7.jpeg';
+import slide8 from '../../slide8.jpeg';
+import slide9 from '../../slide9 .jpeg';
 
 const ADMIN_SETTINGS_KEY = 'harivanga_admin_settings';
 const LEGACY_ADMIN_SETTINGS_KEY = 'mangobd_admin_settings';
@@ -16,6 +25,8 @@ const DEFAULT_HOME_PROMOTION: HomePromotion = {
   promoVideoUrl: '',
   promoDescription: '',
 };
+
+const HOME_BANNER_SLIDES = [slide9, slide1, slide2, slide3, slide4, slide5, slide6, slide7, slide8];
 
 const loadHomePromotion = (): HomePromotion => {
   if (typeof window === 'undefined') return DEFAULT_HOME_PROMOTION;
@@ -75,6 +86,7 @@ export const Home: React.FC = () => {
   const { products: featuredProducts } = useProducts({ limit: 4 });
   const [promotion, setPromotion] = useState<HomePromotion>(DEFAULT_HOME_PROMOTION);
   const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
+  const [activeBannerSlide, setActiveBannerSlide] = useState(0);
 
   useEffect(() => {
     setPromotion(loadHomePromotion());
@@ -84,6 +96,14 @@ export const Home: React.FC = () => {
     setIsPromoVideoOpen(false);
   }, [promotion.promoVideoUrl]);
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActiveBannerSlide((currentSlide) => (currentSlide + 1) % HOME_BANNER_SLIDES.length);
+    }, 3500);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const promoVideoUrl = promotion.promoVideoUrl.trim();
   const promoDescription = promotion.promoDescription.trim();
   const promoEmbedUrl = promoVideoUrl ? getYoutubeEmbedUrl(promoVideoUrl) : null;
@@ -92,45 +112,74 @@ export const Home: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative min-h-[calc(100vh-4rem)] sm:min-h-[680px] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/downloaded/hero.webp"
-            alt="Fresh Mangoes"
-            className="w-full h-full object-cover"
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-mango-dark/80 via-mango-dark/40 to-transparent" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 lg:pt-24 pb-14 sm:pb-20 relative z-10 w-full">
-          <div className="max-w-3xl fade-up-enter">
-            <span className="inline-block bg-mango-orange text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] mb-6">
-              Season 2026 is Here
+      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_right,_rgba(255,194,84,0.18),_rgba(255,255,255,1)_52%)]">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,250,241,0.96),rgba(255,255,255,0.88))]" />
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:grid-cols-[minmax(0,1.02fr)_minmax(430px,0.98fr)] lg:gap-14 lg:px-8 lg:pb-20 lg:pt-24">
+          <div className="max-w-3xl">
+            <span className="mb-6 inline-block rounded-full bg-[#77ef77] px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#155724] sm:text-sm">
+              Season 2026 Is Here
             </span>
-            <h1 className="max-w-4xl text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[0.95] mb-6">
-              Farm Fresh <span className="text-mango-yellow">Mangoes</span>, Delivered to Your Door
+            <h1 className="max-w-4xl text-[3.05rem] font-black leading-[0.92] tracking-tight text-[#8f4b00] sm:text-6xl lg:text-7xl xl:text-[5.2rem]">
+              Farm Fresh <span className="text-mango-orange italic">Mangoes</span> for Every Doorstep
             </h1>
-            <p className="text-base sm:text-lg text-gray-200 mb-8 sm:mb-10 leading-relaxed max-w-2xl">
-              Straight from Podaganj&apos;s legendary red-soil farms — where the world&apos;s best Harivanga grows. Tree-ripened, chemical-free, delivered fresh.
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-[#6f6255] sm:text-lg">
+              Straight from Podaganj&apos;s legendary red-soil farms, our hand-picked Harivanga mangoes arrive tree-ripened,
+              chemical-free, and packed for a premium fresh-fruit experience.
             </p>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 max-w-3xl">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
               <Link
                 to="/products"
-                className="w-full sm:w-auto bg-mango-orange hover:bg-mango-orange/90 text-white px-6 sm:px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-mango-orange/20 group"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-mango-orange px-6 py-4 text-base font-bold text-white shadow-[0_16px_36px_rgba(255,107,53,0.26)] transition-all hover:bg-mango-orange/90 sm:w-auto sm:px-8"
               >
-                Shop Now
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                Order Now
+                <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/about"
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-6 sm:px-8 py-4 rounded-2xl font-bold transition-all text-center"
+                className="inline-flex w-full items-center justify-center rounded-full border border-[#e6d7c4] bg-white/80 px-6 py-4 text-base font-bold text-[#8f4b00] transition-all hover:bg-white sm:w-auto sm:px-8"
               >
                 Our Story
               </Link>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -inset-4 rounded-[36px] bg-[radial-gradient(circle,_rgba(255,184,77,0.24),_transparent_65%)] blur-2xl" />
+            <div className="relative overflow-hidden rounded-[30px] border border-[#eadfce] bg-[#201b16] p-3 shadow-[0_24px_60px_rgba(69,42,0,0.18)] sm:p-4">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#1f1b16_0%,#2b241c_100%)] sm:aspect-[5/6] lg:h-[540px] lg:aspect-auto">
+                <div className="absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/40 via-black/12 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-black/55 via-black/18 to-transparent" />
+                {HOME_BANNER_SLIDES.map((slideSrc, index) => (
+                  <img
+                    key={slideSrc}
+                    src={slideSrc}
+                    alt=""
+                    aria-hidden={index !== activeBannerSlide}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                      index === activeBannerSlide ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                ))}
+
+                <div className="absolute left-4 top-4 z-10 rounded-full bg-white/92 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f4b00] shadow-sm sm:left-5 sm:top-5">
+                  Premium Harvest
+                </div>
+                <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/25 px-3 py-2 backdrop-blur-sm sm:bottom-5">
+                  {HOME_BANNER_SLIDES.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setActiveBannerSlide(index)}
+                      aria-label={`Show banner slide ${index + 1}`}
+                      className={`h-2.5 rounded-full transition-all ${
+                        index === activeBannerSlide ? 'w-7 bg-white' : 'w-2.5 bg-white/55 hover:bg-white/80'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -183,10 +232,10 @@ export const Home: React.FC = () => {
       {/* Featured Products */}
       <section className="py-24 bg-white [content-visibility:auto] [contain-intrinsic-size:1px_900px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end mb-12">
+          <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <span className="text-mango-orange font-bold text-sm uppercase tracking-widest">Our Selection</span>
-              <h2 className="text-4xl font-black mt-2">Featured Varieties</h2>
+              <h2 className="mt-2 text-4xl font-black">Featured Varieties</h2>
             </div>
             <Link to="/products" className="text-mango-orange font-bold flex items-center gap-1 hover:underline">
               View All <ArrowRight size={16} />
@@ -266,15 +315,15 @@ export const Home: React.FC = () => {
       {/* Why Choose Us */}
       <section className="py-24 bg-mango-dark text-white overflow-hidden relative [content-visibility:auto] [contain-intrinsic-size:1px_1100px]">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
-          <img 
-            src="/images/downloaded/pattern.webp" 
-            alt="Pattern" 
+          <img
+            src="/images/downloaded/pattern.webp"
+            alt="Pattern"
             className="w-full h-full object-cover"
             loading="lazy"
             decoding="async"
           />
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -307,9 +356,9 @@ export const Home: React.FC = () => {
             </div>
             <div className="relative">
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src="/images/downloaded/farm.webp" 
-                  alt="Farm" 
+                <img
+                  src="/images/downloaded/farm.webp"
+                  alt="Farm"
                   className="w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
