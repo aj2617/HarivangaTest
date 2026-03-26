@@ -587,6 +587,9 @@ export const AdminDashboard: React.FC = () => {
       return;
     }
 
+    const previousOrders = orders;
+    setOrders((current) => current.map((order) => (order.id === orderId ? { ...order, paymentStatus } : order)));
+
     try {
       const { error } = await supabase.from('orders').update({ payment_status: paymentStatus }).eq('id', orderId);
       if (error) {
@@ -594,6 +597,7 @@ export const AdminDashboard: React.FC = () => {
       }
       await Promise.all([loadOverviewData(), loadOrdersPage()]);
     } catch (error) {
+      setOrders(previousOrders);
       handleDatabaseError(error, OperationType.UPDATE, 'orders');
     }
   };
