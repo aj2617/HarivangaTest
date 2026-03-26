@@ -207,7 +207,6 @@ export const AdminDashboard: React.FC = () => {
   const [orderTotalCount, setOrderTotalCount] = useState(0);
   const [productSearchQuery, setProductSearchQuery] = useState('');
   const [productStatusFilter, setProductStatusFilter] = useState<'all' | 'inSeason' | 'outOfSeason'>('all');
-  const [productStockFilter, setProductStockFilter] = useState<'all' | 'inStock' | 'lowStock' | 'outOfStock'>('all');
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | OrderStatus>('all');
   const [orderDateFilter, setOrderDateFilter] = useState('');
@@ -265,13 +264,7 @@ export const AdminDashboard: React.FC = () => {
           productStatusFilter === 'all' ||
           (productStatusFilter === 'inSeason' && product.isAvailable) ||
           (productStatusFilter === 'outOfSeason' && !product.isAvailable);
-        const matchesStock =
-          productStockFilter === 'all' ||
-          (productStockFilter === 'inStock' && product.stock > settingsForm.lowStockThreshold) ||
-          (productStockFilter === 'lowStock' && product.stock > 0 && product.stock <= settingsForm.lowStockThreshold) ||
-          (productStockFilter === 'outOfStock' && product.stock <= 0);
-
-        return matchesQuery && matchesStatus && matchesStock;
+        return matchesQuery && matchesStatus;
       });
 
       setProductTotalCount(allProducts.length);
@@ -295,14 +288,6 @@ export const AdminDashboard: React.FC = () => {
       query = query.eq('is_available', true);
     } else if (productStatusFilter === 'outOfSeason') {
       query = query.eq('is_available', false);
-    }
-
-    if (productStockFilter === 'inStock') {
-      query = query.gt('stock', settingsForm.lowStockThreshold);
-    } else if (productStockFilter === 'lowStock') {
-      query = query.gt('stock', 0).lte('stock', settingsForm.lowStockThreshold);
-    } else if (productStockFilter === 'outOfStock') {
-      query = query.lte('stock', 0);
     }
 
     const { data, error, count } = await query.range(start, start + PRODUCTS_PAGE_SIZE - 1);
@@ -411,7 +396,6 @@ export const AdminDashboard: React.FC = () => {
     productPage,
     productSearchQuery,
     productStatusFilter,
-    productStockFilter,
     settingsForm.lowStockThreshold,
   ]);
 
@@ -473,13 +457,12 @@ export const AdminDashboard: React.FC = () => {
     productPage,
     productSearchQuery,
     productStatusFilter,
-    productStockFilter,
     settingsForm.lowStockThreshold,
   ]);
 
   useEffect(() => {
     setProductPage(1);
-  }, [productSearchQuery, productStatusFilter, productStockFilter]);
+  }, [productSearchQuery, productStatusFilter]);
 
   useEffect(() => {
     setOrderPage(1);
@@ -768,6 +751,13 @@ export const AdminDashboard: React.FC = () => {
     }));
   };
 
+  const handleAddPackageVariant = (weightLabel: string) => {
+    setProductForm((current) => ({
+      ...current,
+      variants: [...(current.variants ?? [{ ...DEFAULT_PRODUCT_VARIANT }]), { weight: weightLabel, price: 0 }],
+    }));
+  };
+
   const handleRemoveVariant = (index: number) => {
     setProductForm((current) => {
       const currentVariants = current.variants ?? [{ ...DEFAULT_PRODUCT_VARIANT }];
@@ -958,16 +948,6 @@ export const AdminDashboard: React.FC = () => {
     if (paymentStatus === 'Rejected') return 'bg-red-50 text-red-500';
     if (paymentStatus === 'Awaiting Verification') return 'bg-amber-50 text-amber-600';
     return 'bg-gray-50 text-gray-500';
-  };
-  const getStockClasses = (stock: number) => {
-    if (stock <= 0) return 'bg-red-50 text-red-500';
-    if (stock <= settingsForm.lowStockThreshold) return 'bg-amber-50 text-amber-600';
-    return 'bg-green-50 text-green-600';
-  };
-  const getStockBarClasses = (stock: number) => {
-    if (stock <= 0) return 'bg-red-500';
-    if (stock <= settingsForm.lowStockThreshold) return 'bg-amber-400';
-    return 'bg-green-500';
   };
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
@@ -1181,7 +1161,7 @@ export const AdminDashboard: React.FC = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_220px_220px]">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
@@ -1201,16 +1181,6 @@ export const AdminDashboard: React.FC = () => {
                 <option value="inSeason">In season</option>
                 <option value="outOfSeason">Out of season</option>
               </select>
-              <select
-                value={productStockFilter}
-                onChange={(e) => setProductStockFilter(e.target.value as 'all' | 'inStock' | 'lowStock' | 'outOfStock')}
-                className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-mango-orange/20"
-              >
-                <option value="all">All stock</option>
-                <option value="inStock">Healthy stock</option>
-                <option value="lowStock">Low stock</option>
-                <option value="outOfStock">Out of stock</option>
-              </select>
             </div>
 
             <div className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-x-auto">
@@ -1220,7 +1190,6 @@ export const AdminDashboard: React.FC = () => {
                     <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Product</th>
                     <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Variety</th>
                     <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Price</th>
-                    <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Stock</th>
                     <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                     <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
                   </tr>
@@ -1246,22 +1215,6 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="px-8 py-4 text-sm text-gray-500">{product.variety}</td>
                       <td className="px-8 py-4 font-bold">{formatCurrency(product.pricePerKg)}</td>
-                      <td className="px-8 py-4">
-                        <div className="min-w-[180px]">
-                          <div className="mb-2 flex items-center justify-between text-sm">
-                            <span className="font-semibold text-mango-dark">{product.stock} kg</span>
-                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStockClasses(product.stock)}`}>
-                              {product.stock <= 0 ? 'Out' : product.stock <= settingsForm.lowStockThreshold ? 'Low' : 'Healthy'}
-                            </span>
-                          </div>
-                          <div className="h-2 rounded-full bg-gray-100">
-                            <div
-                              className={`h-2 rounded-full ${getStockBarClasses(product.stock)}`}
-                              style={{ width: `${Math.min((product.stock / Math.max(settingsForm.lowStockThreshold * 4, 1)) * 100, 100)}%` }}
-                            />
-                          </div>
-                        </div>
-                      </td>
                       <td className="px-8 py-4">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${product.isAvailable ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                           {product.isAvailable ? 'In Season' : 'Out of Season'}
@@ -1319,21 +1272,11 @@ export const AdminDashboard: React.FC = () => {
                           {product.isAvailable ? 'In Season' : 'Out'}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
+                      <div className="grid grid-cols-1 gap-3 mt-4 text-sm">
                         <div className="rounded-2xl bg-gray-50 px-3 py-2">
                           <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Price</p>
                           <p className="font-bold">{formatCurrency(product.pricePerKg)}</p>
                         </div>
-                        <div className="rounded-2xl bg-gray-50 px-3 py-2">
-                          <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Stock</p>
-                          <p className="font-bold">{product.stock} kg</p>
-                        </div>
-                      </div>
-                      <div className="mt-3 h-2 rounded-full bg-gray-100">
-                        <div
-                          className={`h-2 rounded-full ${getStockBarClasses(product.stock)}`}
-                          style={{ width: `${Math.min((product.stock / Math.max(settingsForm.lowStockThreshold * 4, 1)) * 100, 100)}%` }}
-                        />
                       </div>
                       <div className="mt-4 flex gap-2">
                         <button
@@ -1702,12 +1645,13 @@ export const AdminDashboard: React.FC = () => {
             submitError={productSubmitError}
             onClose={resetProductModal}
             onSubmit={handleSaveProduct}
-            onChange={setProductForm}
-            onVariantChange={handleVariantChange}
-            onAddVariant={handleAddVariant}
-            onRemoveVariant={handleRemoveVariant}
-            onProductImageUpload={handleProductImageUpload}
-            onPrimaryImageSelect={handlePrimaryImageSelect}
+                onChange={setProductForm}
+                onVariantChange={handleVariantChange}
+                onAddVariant={handleAddVariant}
+                onAddPackageVariant={handleAddPackageVariant}
+                onRemoveVariant={handleRemoveVariant}
+                onProductImageUpload={handleProductImageUpload}
+                onPrimaryImageSelect={handlePrimaryImageSelect}
             onRemoveProductImage={handleRemoveProductImage}
           />
         </Suspense>

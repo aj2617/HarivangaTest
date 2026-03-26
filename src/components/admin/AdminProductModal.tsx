@@ -15,6 +15,7 @@ type AdminProductModalProps = {
   onChange: (next: Partial<Product>) => void;
   onVariantChange: (index: number, key: keyof Product['variants'][number], value: string) => void;
   onAddVariant: () => void;
+  onAddPackageVariant: (weightLabel: string) => void;
   onRemoveVariant: (index: number) => void;
   onProductImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onPrimaryImageSelect: (image: string) => void;
@@ -33,11 +34,22 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
   onChange,
   onVariantChange,
   onAddVariant,
+  onAddPackageVariant,
   onRemoveVariant,
   onProductImageUpload,
   onPrimaryImageSelect,
   onRemoveProductImage,
 }) => {
+  const [customPackageKg, setCustomPackageKg] = React.useState('');
+
+  const handleAddCustomPackage = () => {
+    const trimmed = customPackageKg.trim();
+    if (!trimmed) return;
+
+    onAddPackageVariant(`${trimmed}kg Package`);
+    setCustomPackageKg('');
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div onClick={onClose} className="absolute inset-0 bg-mango-dark/60 backdrop-blur-sm" />
@@ -68,12 +80,17 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                 onChange={(e) => onChange({ ...productForm, variety: e.target.value })}
                 className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-mango-orange/20"
               >
-                <option>Harivanga</option>
-                <option>Himsagar</option>
-                <option>Langra</option>
-                <option>Alphonso</option>
-                <option>Amrapali</option>
-                <option>Fazli</option>
+                <option>হাড়িভাঙ্গা</option>
+                <option>আম রুপালী</option>
+                <option>বারি-৪</option>
+                <option>গৌড়মতি</option>
+                <option>ব্যানানা</option>
+                <option>কপিল বাংড়ি</option>
+                <option>সাদা আম</option>
+                <option>হিমসাগর</option>
+                <option>খিরসাপাত</option>
+                <option>কাটিমন</option>
+                <option>ফজলি</option>
               </select>
             </div>
           </div>
@@ -130,14 +147,52 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Price Options</label>
-              <button type="button" onClick={onAddVariant} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-mango-dark">
-                <Plus size={14} />
-                Add Price
-              </button>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <button type="button" onClick={() => onAddPackageVariant('1kg')} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-mango-dark">
+                  <Plus size={14} />
+                  1kg
+                </button>
+                <button type="button" onClick={() => onAddPackageVariant('3kg Package')} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-mango-dark">
+                  <Plus size={14} />
+                  3kg
+                </button>
+                <button type="button" onClick={() => onAddPackageVariant('5kg Package')} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-mango-dark">
+                  <Plus size={14} />
+                  5kg
+                </button>
+                <button type="button" onClick={onAddVariant} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-mango-dark">
+                  <Plus size={14} />
+                  Add Price
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 sm:flex-row sm:items-center">
+              <div className="flex-1">
+                <p className="text-sm font-bold text-mango-dark">Custom package</p>
+                <p className="text-xs text-gray-500">Create package options like 11kg, 22kg, or any custom weight.</p>
+              </div>
+              <div className="flex w-full gap-2 sm:w-auto">
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={customPackageKg}
+                  onChange={(e) => setCustomPackageKg(e.target.value)}
+                  placeholder="11"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-mango-orange/20 sm:w-24"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomPackage}
+                  className="inline-flex items-center justify-center rounded-xl bg-mango-orange px-4 py-3 text-sm font-bold text-white transition-all hover:bg-mango-orange/90"
+                >
+                  Add Custom
+                </button>
+              </div>
             </div>
             <div className="space-y-3">
               {(productForm.variants ?? []).map((variant, index) => (
-                <div key={`${variant.weight}-${index}`} className="grid grid-cols-1 gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 md:grid-cols-[minmax(0,1fr)_180px_52px]">
+                <div key={index} className="grid grid-cols-1 gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 md:grid-cols-[minmax(0,1fr)_180px_52px]">
                   <input
                     required
                     type="text"
