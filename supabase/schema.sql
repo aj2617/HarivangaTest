@@ -64,18 +64,21 @@ alter table public.users enable row level security;
 alter table public.products enable row level security;
 alter table public.orders enable row level security;
 
+drop policy if exists "users_select_own_profile" on public.users;
 create policy "users_select_own_profile"
 on public.users
 for select
 to authenticated
 using (auth.uid() = id);
 
+drop policy if exists "users_insert_own_profile" on public.users;
 create policy "users_insert_own_profile"
 on public.users
 for insert
 to authenticated
 with check (auth.uid() = id);
 
+drop policy if exists "users_update_own_profile" on public.users;
 create policy "users_update_own_profile"
 on public.users
 for update
@@ -83,12 +86,14 @@ to authenticated
 using (auth.uid() = id)
 with check (auth.uid() = id);
 
+drop policy if exists "products_are_public_readable" on public.products;
 create policy "products_are_public_readable"
 on public.products
 for select
 to anon, authenticated
 using (true);
 
+drop policy if exists "products_admin_write" on public.products;
 create policy "products_admin_write"
 on public.products
 for all
@@ -108,12 +113,14 @@ with check (
   )
 );
 
+drop policy if exists "orders_public_insert" on public.orders;
 create policy "orders_public_insert"
 on public.orders
 for insert
 to anon, authenticated
 with check (user_id is null or auth.uid() = user_id);
 
+drop policy if exists "orders_read_own_or_admin" on public.orders;
 create policy "orders_read_own_or_admin"
 on public.orders
 for select
@@ -127,6 +134,7 @@ using (
   )
 );
 
+drop policy if exists "orders_admin_update" on public.orders;
 create policy "orders_admin_update"
 on public.orders
 for update
