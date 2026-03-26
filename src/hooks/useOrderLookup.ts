@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { mapOrderRow, ORDER_SELECT, supabase } from '../supabase';
 import { getLocalDevOrderById } from '../lib/localDevOrders';
-import { getRecentOrderById, saveRecentOrder } from '../lib/recentOrders';
+import { getRecentOrderById } from '../lib/recentOrders';
 import { hasSupabaseConfig } from '../lib/env';
 import { Order } from '../types';
 
@@ -32,7 +32,9 @@ export function useOrderLookup({ orderId, userId, isAdmin = false }: UseOrderLoo
         if (recentOrder) {
           if (!cancelled) {
             setOrder(recentOrder);
+            setLoading(false);
           }
+          return;
         }
 
         const localOrder = getLocalDevOrderById(orderId);
@@ -68,15 +70,11 @@ export function useOrderLookup({ orderId, userId, isAdmin = false }: UseOrderLoo
         }
 
         if (!cancelled) {
-          const nextOrder = data ? mapOrderRow(data) : null;
-          setOrder(nextOrder);
-          if (nextOrder) {
-            saveRecentOrder(nextOrder);
-          }
+          setOrder(data ? mapOrderRow(data) : null);
         }
       } catch (error) {
         console.error('Failed to load order', error);
-        if (!cancelled && !getRecentOrderById(orderId)) {
+        if (!cancelled) {
           setOrder(null);
         }
       } finally {
