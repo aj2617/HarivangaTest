@@ -115,11 +115,6 @@ export const Account: React.FC = () => {
       return;
     }
 
-    if (!canUseLocalOrderFallback() && !user) {
-      setSearchError('Sign in with your email and password to view your orders in production.');
-      return;
-    }
-
     setSearchError(null);
     setHasSearched(true);
     setIsSearching(true);
@@ -132,13 +127,15 @@ export const Account: React.FC = () => {
       });
 
       if (!canUseLocalOrderFallback()) {
-        const { data, error } = await supabase
-          .from('orders')
-          .select(ORDER_SELECT)
-          .eq('user_id', user!.id)
-          .eq('customer_phone_normalized', normalizedPhone)
-          .order('created_at', { ascending: false })
-          .limit(1);
+        const { data, error } = user
+          ? await supabase
+              .from('orders')
+              .select(ORDER_SELECT)
+              .eq('user_id', user.id)
+              .eq('customer_phone_normalized', normalizedPhone)
+              .order('created_at', { ascending: false })
+              .limit(1)
+          : await supabase.rpc('track_orders_by_phone', { p_phone: normalizedPhone });
 
         if (error) {
           throw error;
@@ -178,7 +175,7 @@ export const Account: React.FC = () => {
             <p className="mt-3 text-gray-500">
               {canUseLocalOrderFallback()
                 ? 'Enter the phone number used at checkout to view your latest order updates.'
-                : 'Use your email account and the checkout phone number to view your latest order updates.'}
+                : 'Enter the checkout phone number to view your latest order updates. Signing in is optional.'}
             </p>
           </div>
 
@@ -188,10 +185,10 @@ export const Account: React.FC = () => {
                 <div className="max-w-xl">
                   <p className="text-sm font-semibold uppercase tracking-[0.2em] text-mango-orange">Customer Account</p>
                   <h2 className="mt-2 text-2xl font-black text-mango-dark">
-                    {user ? 'You are signed in' : 'Sign in to see your order history'}
+                    {user ? 'You are signed in' : 'Sign in to see your full order history'}
                   </h2>
                   <p className="mt-2 text-sm text-gray-500">
-                    Production order lookup is restricted to the customer account that placed the order.
+                    Phone-based order tracking works without sign-in. Sign in only if you want account-based history and saved details.
                   </p>
                   {user ? (
                     <div className="mt-4 rounded-2xl border border-gray-200 bg-white px-4 py-4 text-sm text-gray-600">
@@ -336,7 +333,6 @@ export const Account: React.FC = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="01XXXXXXXXX"
-                disabled={!canUseLocalOrderFallback() && !user}
                 className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 focus:border-mango-orange focus:outline-none focus:ring-2 focus:ring-mango-orange/20"
               />
             </label>

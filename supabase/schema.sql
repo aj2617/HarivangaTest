@@ -146,6 +146,22 @@ with check (
   )
 );
 
+create or replace function public.track_orders_by_phone(p_phone text)
+returns setof public.orders
+language sql
+security definer
+set search_path = public
+as $$
+  select orders.*
+  from public.orders
+  where regexp_replace(coalesce(orders.customer_phone_normalized, orders.customer_phone), '\D', '', 'g')
+    = regexp_replace(coalesce(p_phone, ''), '\D', '', 'g')
+  order by orders.created_at desc
+  limit 5;
+$$;
+
+grant execute on function public.track_orders_by_phone(text) to anon, authenticated;
+
 create index if not exists orders_customer_phone_idx on public.orders (customer_phone);
 create index if not exists orders_customer_phone_normalized_idx on public.orders (customer_phone_normalized);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);

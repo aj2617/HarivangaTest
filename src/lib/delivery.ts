@@ -3,8 +3,8 @@ import { CartItem } from '../types';
 export type DeliveryMethod = 'Home Delivery' | 'Courier Pickup';
 
 export const DELIVERY_RATE_PER_KG: Record<DeliveryMethod, number> = {
-  'Home Delivery': 120,
-  'Courier Pickup': 110,
+  'Home Delivery': 110,
+  'Courier Pickup': 100,
 };
 
 export function getVariantWeightKg(variant: string) {
