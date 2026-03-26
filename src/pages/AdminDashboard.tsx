@@ -8,6 +8,7 @@ import { getLocalDevOrders, LOCAL_DEV_ORDERS_UPDATED_EVENT, setLocalDevOrders } 
 import { notifyStorefrontProductsChanged } from '../lib/storefrontSync';
 import { optimizeProductUpload } from '../lib/imageOptimization';
 import { getThumbnailImageSrc } from '../lib/imageSources';
+import type { PromoStoryInput } from '../components/admin/AdminSettingsPanel';
 import { BrandLogo } from '../components/BrandLogo';
 import { formatLongDate, formatOrderTimestamp, formatShortMonthDay } from '../lib/dates';
 import { 
@@ -29,6 +30,11 @@ const LOCAL_DEV_ADMIN_PASSWORD = 'admin1234';
 type AdminTab = 'overview' | 'products' | 'orders' | 'settings';
 type DeliveryZoneSetting = { id: string; name: string; charge: number };
 type AdminUserSetting = { id: string; name: string; email: string; role: 'Admin' | 'Manager' | 'Staff' };
+type LegacyPromoSettings = {
+  promoTitle?: string;
+  promoVideoUrl?: string;
+  promoDescription?: string;
+};
 
 type AdminSettings = {
   storeName: string;
@@ -76,8 +82,37 @@ type AdminSettings = {
   autoToggleSeasonalProducts: boolean;
   storeOpensAt: string;
   storeClosesAt: string;
-  promoVideoUrl: string;
-  promoDescription: string;
+  promoStories: PromoStoryInput[];
+};
+
+const createPromoStory = (overrides: Partial<PromoStoryInput> = {}): PromoStoryInput => ({
+  id: overrides.id ?? `story-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  title: overrides.title ?? '',
+  videoUrl: overrides.videoUrl ?? '',
+  description: overrides.description ?? '',
+});
+
+const normalizePromoStories = (value: unknown): PromoStoryInput[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((entry, index) => {
+      if (!entry || typeof entry !== 'object') return null;
+      const story = entry as Partial<PromoStoryInput>;
+      const title = typeof story.title === 'string' ? story.title : '';
+      const videoUrl = typeof story.videoUrl === 'string' ? story.videoUrl : '';
+      const description = typeof story.description === 'string' ? story.description : '';
+
+      if (!title.trim() && !videoUrl.trim() && !description.trim()) return null;
+
+      return createPromoStory({
+        id: typeof story.id === 'string' && story.id ? story.id : `story-${index + 1}`,
+        title,
+        videoUrl,
+        description,
+      });
+    })
+    .filter((story): story is PromoStoryInput => story !== null);
 };
 
 const ADMIN_SETTINGS_KEY = 'harivanga_admin_settings';
@@ -153,8 +188,7 @@ const DEFAULT_SETTINGS: AdminSettings = {
   autoToggleSeasonalProducts: true,
   storeOpensAt: '08:00',
   storeClosesAt: '22:00',
-  promoVideoUrl: '',
-  promoDescription: '',
+  promoStories: [createPromoStory()],
 };
 
 const loadSettings = (): AdminSettings => {
@@ -163,7 +197,26 @@ const loadSettings = (): AdminSettings => {
     const raw =
       window.localStorage.getItem(ADMIN_SETTINGS_KEY) ??
       window.localStorage.getItem(LEGACY_ADMIN_SETTINGS_KEY);
-    return raw ? { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<AdminSettings>) } : DEFAULT_SETTINGS;
+    if (!raw) return DEFAULT_SETTINGS;
+
+    const parsed = JSON.parse(raw) as Partial<AdminSettings> & LegacyPromoSettings;
+    const normalizedStories = normalizePromoStories(parsed.promoStories);
+    const legacyStories =
+      typeof parsed.promoVideoUrl === 'string' && parsed.promoVideoUrl.trim()
+        ? [
+            createPromoStory({
+              title: typeof parsed.promoTitle === 'string' ? parsed.promoTitle : '',
+              videoUrl: parsed.promoVideoUrl,
+              description: typeof parsed.promoDescription === 'string' ? parsed.promoDescription : '',
+            }),
+          ]
+        : [];
+
+    return {
+      ...DEFAULT_SETTINGS,
+      ...parsed,
+      promoStories: normalizedStories.length ? normalizedStories : legacyStories.length ? legacyStories : [createPromoStory()],
+    };
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -647,6 +700,31 @@ export const AdminDashboard: React.FC = () => {
         handleDatabaseError(error, OperationType.DELETE, 'products');
       }
     }
+  };
+
+  const handlePromoStoryChange = (id: string, field: 'title' | 'videoUrl' | 'description', value: string) => {
+    setSettingsForm((current) => ({
+      ...current,
+      promoStories: current.promoStories.map((story) => (story.id === id ? { ...story, [field]: value } : story)),
+    }));
+  };
+
+  const handleAddPromoStory = () => {
+    setSettingsForm((current) => ({
+      ...current,
+      promoStories: [...current.promoStories, createPromoStory()],
+    }));
+  };
+
+  const handleRemovePromoStory = (id: string) => {
+    setSettingsForm((current) => {
+      if (current.promoStories.length <= 1) return current;
+
+      return {
+        ...current,
+        promoStories: current.promoStories.filter((story) => story.id !== id),
+      };
+    });
   };
 
   const handleSaveSettings = (event: React.FormEvent) => {
@@ -1638,11 +1716,11 @@ export const AdminDashboard: React.FC = () => {
         {activeTab === 'settings' && (
           <Suspense fallback={<div className="rounded-3xl border border-gray-200 bg-white px-6 py-10 text-center text-sm text-gray-500">Loading settings...</div>}>
             <AdminSettingsPanel
-              promoVideoUrl={settingsForm.promoVideoUrl}
-              promoDescription={settingsForm.promoDescription}
+              promoStories={settingsForm.promoStories}
               savedMessage={settingsSavedMessage}
-              onPromoVideoUrlChange={(value) => setSettingsForm({ ...settingsForm, promoVideoUrl: value })}
-              onPromoDescriptionChange={(value) => setSettingsForm({ ...settingsForm, promoDescription: value })}
+              onPromoStoryChange={handlePromoStoryChange}
+              onAddPromoStory={handleAddPromoStory}
+              onRemovePromoStory={handleRemovePromoStory}
               onReset={handleResetSettings}
               onSubmit={handleSaveSettings}
             />
