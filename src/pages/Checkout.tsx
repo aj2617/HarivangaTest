@@ -504,8 +504,15 @@ export const Checkout: React.FC = () => {
                           Select `bKash`, `Nagad`, or `Rocket`.
                         </div>
                       )}
-                      <div className="mt-3 rounded-xl bg-white px-4 py-3 text-sm font-bold text-mango-dark shadow-sm">
-                        Payment Number: {SEND_MONEY_NUMBER}
+                      <div className="mt-3 flex flex-col gap-3 rounded-xl bg-white px-4 py-3 text-sm font-bold text-mango-dark shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                        <span>Payment Number: {SEND_MONEY_NUMBER}</span>
+                        <button
+                          type="button"
+                          onClick={handleCopyPaymentNumber}
+                          className="inline-flex items-center justify-center rounded-lg bg-mango-orange px-3 py-2 text-xs font-bold text-white transition-all hover:bg-mango-orange/90"
+                        >
+                          {copyStatus === 'copied' ? 'Payment number copied' : 'Copy payment number'}
+                        </button>
                       </div>
                       <div className="mt-3 rounded-xl bg-white px-4 py-3 text-sm font-bold text-mango-dark shadow-sm">
                         Confirmation Amount: {formatCurrency(MOBILE_PAYMENT_CONFIRMATION_AMOUNT)}
@@ -533,15 +540,6 @@ export const Checkout: React.FC = () => {
                             placeholder="Enter transaction ID"
                           />
                         </label>
-                      </div>
-                      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                        <button
-                          type="button"
-                          onClick={handleCopyPaymentNumber}
-                          className="inline-flex items-center justify-center rounded-xl bg-mango-orange px-4 py-3 text-sm font-bold text-white transition-all hover:bg-mango-orange/90"
-                        >
-                          {copyStatus === 'copied' ? 'Number Copied' : 'Copy Number'}
-                        </button>
                       </div>
                       <p className="mt-3 text-xs leading-relaxed text-gray-500">
                         Send exactly {formatCurrency(MOBILE_PAYMENT_CONFIRMATION_AMOUNT)}, then submit the sender number and transaction ID.
