@@ -12,6 +12,7 @@ import slide6 from '../../slide6.jpeg';
 import slide7 from '../../slide7.jpeg';
 import slide8 from '../../slide8.jpeg';
 import slide9 from '../../slide9 .jpeg';
+import slide10 from '../../slide10.jpeg';
 
 const ADMIN_SETTINGS_KEY = 'harivanga_admin_settings';
 const LEGACY_ADMIN_SETTINGS_KEY = 'mangobd_admin_settings';
@@ -52,7 +53,7 @@ const normalizePromoStories = (value: unknown): HomePromotion['promoStories'] =>
     .filter((story): story is HomePromotion['promoStories'][number] => story !== null);
 };
 
-const HOME_BANNER_SLIDES = [slide9, slide1, slide2, slide3, slide4, slide5, slide6, slide7, slide8];
+const HOME_BANNER_SLIDES = [slide9, slide1, slide2, slide3, slide4, slide5, slide6, slide7, slide8, slide10];
 
 const loadHomePromotion = (): HomePromotion => {
   if (typeof window === 'undefined') return DEFAULT_HOME_PROMOTION;
@@ -121,6 +122,24 @@ const getYoutubeEmbedUrl = (url: string): string | null => {
   } catch {
     return null;
   }
+};
+
+const getYoutubeVideoId = (url: string): string | null => {
+  const embedUrl = getYoutubeEmbedUrl(url);
+  if (!embedUrl) return null;
+
+  try {
+    const parsed = new URL(embedUrl);
+    const segments = parsed.pathname.split('/').filter(Boolean);
+    return segments[1] ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const getYoutubeThumbnailUrl = (url: string): string | null => {
+  const videoId = getYoutubeVideoId(url);
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
 };
 
 const isDirectVideoFile = (url: string): boolean => /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
@@ -308,24 +327,52 @@ export const Home: React.FC = () => {
             <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
               {promoStories.map((story) => {
                 const embedUrl = getYoutubeEmbedUrl(story.videoUrl);
+                const thumbnailUrl = getYoutubeThumbnailUrl(story.videoUrl);
                 const isOpen = Boolean(openPromoStoryIds[story.id]);
 
                 return (
-                  <article key={story.id} className="overflow-hidden rounded-[32px] border border-[#eadfce] bg-white shadow-sm">
-                    <div className="px-6 pb-5 pt-5">
-                      <h3 className="text-2xl font-black text-[#201b16]">{story.title || 'Story Video'}</h3>
+                  <article
+                    key={story.id}
+                    className="group overflow-hidden rounded-[32px] border border-[#eadfce] bg-[linear-gradient(180deg,#fffaf3_0%,#fff4e8_100%)] shadow-[0_24px_60px_rgba(92,66,36,0.08)] transition-transform duration-300 hover:-translate-y-1"
+                  >
+                    <div className="flex items-start justify-between gap-4 bg-[linear-gradient(180deg,rgba(255,251,245,0.96)_0%,rgba(255,244,230,0.9)_100%)] px-6 pb-5 pt-6">
+                      <div className="space-y-3">
+                        <span className="inline-flex items-center rounded-full bg-[#fff2df] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-[#a35a00]">
+                          Featured Story
+                        </span>
+                        <h3 className="text-2xl font-black leading-tight text-[#201b16]">{story.title || 'Story Video'}</h3>
+                      </div>
+                      <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#fff8f1] text-mango-orange shadow-inner sm:flex">
+                        <PlayCircle size={24} />
+                      </div>
                     </div>
 
-                    <div className="aspect-video bg-[#201b16]">
+                    <div className="relative aspect-video overflow-hidden bg-[#201b16]">
                       {!isOpen ? (
                         <button
                           type="button"
                           onClick={() => setOpenPromoStoryIds((current) => ({ ...current, [story.id]: true }))}
-                          className="flex h-full w-full flex-col items-center justify-center gap-4 bg-[radial-gradient(circle_at_center,_rgba(245,158,11,0.32),_rgba(32,27,22,0.98)_62%)] px-6 text-center text-white"
+                          className="relative flex h-full w-full items-end overflow-hidden text-left text-white"
                         >
-                          <PlayCircle size={56} className="text-mango-yellow" />
-                          <p className="text-lg font-bold">{story.title || 'Play story video'}</p>
-                          <p className="max-w-xl text-sm text-white/75">The video loads only after click to keep the home page lighter.</p>
+                          {thumbnailUrl ? (
+                            <img
+                              src={thumbnailUrl}
+                              alt={story.title || 'Story thumbnail'}
+                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,16,12,0.08)_0%,rgba(21,16,12,0.38)_42%,rgba(21,16,12,0.88)_100%)]" />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,176,59,0.16),transparent_42%)]" />
+                          <div className="relative flex w-full items-end justify-between gap-4 px-6 py-6 sm:px-7 sm:py-7">
+                            <div className="max-w-xl">
+                              <p className="text-lg font-bold sm:text-xl">{story.title || 'Play story video'}</p>
+                            </div>
+                            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/25 bg-[#ffb03b]/20 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
+                              <PlayCircle size={40} className="text-[#ffb03b]" />
+                            </span>
+                          </div>
                         </button>
                       ) : embedUrl ? (
                         <iframe
@@ -363,8 +410,8 @@ export const Home: React.FC = () => {
                     </div>
 
                     {story.description && (
-                      <div className="border-t border-[#efe5d8] px-6 py-5">
-                        <p className="text-sm leading-relaxed text-[#6f6255]">{story.description}</p>
+                      <div className="border-t border-[#efe5d8] bg-[linear-gradient(180deg,#fff7ed_0%,#ffefdd_100%)] px-6 py-5">
+                        <p className="text-sm leading-relaxed text-[#775f47]">{story.description}</p>
                       </div>
                     )}
                   </article>
