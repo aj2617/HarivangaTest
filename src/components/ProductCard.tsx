@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, MapPin, Image as ImageIcon } from 'lucide-react';
 import { Product } from '../types';
-import { useCartActions } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../lib/format';
 import { getThumbnailImageSrc } from '../lib/imageSources';
 
@@ -11,7 +11,7 @@ interface ProductCardProps {
 }
 
 const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart } = useCartActions();
+  const { addToCart } = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [showDelayedPlaceholder, setShowDelayedPlaceholder] = useState(false);

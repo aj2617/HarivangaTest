@@ -166,37 +166,8 @@ export const Home: React.FC = () => {
     return () => window.clearInterval(intervalId);
   }, []);
 
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof globalThis.setTimeout> | null = null;
-    let idleCallbackId: number | null = null;
-
-    const preloadNonCriticalSlides = () => {
-      HOME_BANNER_SLIDES.slice(1).forEach((slideSrc) => {
-        const image = new Image();
-        image.decoding = 'async';
-        image.src = slideSrc;
-      });
-    };
-
-    if ('requestIdleCallback' in window) {
-      idleCallbackId = window.requestIdleCallback(preloadNonCriticalSlides, { timeout: 2500 });
-    } else {
-      timeoutId = globalThis.setTimeout(preloadNonCriticalSlides, 1800);
-    }
-
-    return () => {
-      if (timeoutId !== null) {
-        globalThis.clearTimeout(timeoutId);
-      }
-      if (idleCallbackId !== null && 'cancelIdleCallback' in window) {
-        window.cancelIdleCallback(idleCallbackId);
-      }
-    };
-  }, []);
-
   const promoStories = promotion.promoStories.filter((story) => story.videoUrl.trim());
   const showPromotion = promoStories.length > 0;
-  const activeSlideSrc = HOME_BANNER_SLIDES[activeBannerSlide];
 
   return (
     <div className="flex flex-col">
@@ -238,17 +209,19 @@ export const Home: React.FC = () => {
               <div className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#1f1b16_0%,#2b241c_100%)] sm:aspect-[5/6] lg:h-[540px] lg:aspect-auto">
                 <div className="absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/40 via-black/12 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-black/55 via-black/18 to-transparent" />
-                <img
-                  key={activeSlideSrc}
-                  src={activeSlideSrc}
-                  alt=""
-                  aria-hidden="true"
-                  className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
-                  loading={activeBannerSlide === 0 ? 'eager' : 'lazy'}
-                  decoding={activeBannerSlide === 0 ? 'sync' : 'async'}
-                  fetchPriority={activeBannerSlide === 0 ? 'high' : 'auto'}
-                  sizes="(min-width: 1024px) 430px, (min-width: 640px) 55vw, 100vw"
-                />
+                {HOME_BANNER_SLIDES.map((slideSrc, index) => (
+                  <img
+                    key={slideSrc}
+                    src={slideSrc}
+                    alt=""
+                    aria-hidden={index !== activeBannerSlide}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                      index === activeBannerSlide ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                ))}
 
                 <div className="absolute left-4 top-4 z-10 rounded-full bg-white/92 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f4b00] shadow-sm sm:left-5 sm:top-5">
                   Premium Harvest

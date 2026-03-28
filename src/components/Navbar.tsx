@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, Menu, X, LogOut } from 'lucide-react';
-import { useCartSummary } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { BrandLogo } from './BrandLogo';
 
 export const Navbar: React.FC = () => {
-  const { totalItems } = useCartSummary();
+  const { totalItems } = useCart();
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();

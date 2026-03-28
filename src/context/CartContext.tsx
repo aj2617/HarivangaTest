@@ -12,39 +12,16 @@ interface CartContextType {
   subtotal: number;
 }
 
-type CartActions = Pick<CartContextType, 'addToCart' | 'replaceCart' | 'removeFromCart' | 'updateQuantity' | 'clearCart'>;
-type CartSummary = Pick<CartContextType, 'totalItems' | 'subtotal'>;
-
-const CART_STORAGE_KEY = 'mango_cart';
-const EMPTY_CART: CartItem[] = [];
-
-const CartItemsContext = createContext<CartItem[] | undefined>(undefined);
-const CartActionsContext = createContext<CartActions | undefined>(undefined);
-const CartSummaryContext = createContext<CartSummary | undefined>(undefined);
-
-function readStoredCart(): CartItem[] {
-  if (typeof window === 'undefined') {
-    return EMPTY_CART;
-  }
-
-  try {
-    const saved = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (!saved) {
-      return EMPTY_CART;
-    }
-
-    const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed : EMPTY_CART;
-  } catch {
-    return EMPTY_CART;
-  }
-}
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cart, setCart] = useState<CartItem[]>(readStoredCart);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const saved = localStorage.getItem('mango_cart');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    localStorage.setItem('mango_cart', JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = useCallback((item: CartItem) => {
@@ -83,48 +60,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const totalItems = useMemo(() => cart.reduce((acc, item) => acc + item.quantity, 0), [cart]);
   const subtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0), [cart]);
-  const actions = useMemo(
-    () => ({ addToCart, replaceCart, removeFromCart, updateQuantity, clearCart }),
-    [addToCart, replaceCart, removeFromCart, updateQuantity, clearCart]
+  const value = useMemo(
+    () => ({ cart, addToCart, replaceCart, removeFromCart, updateQuantity, clearCart, totalItems, subtotal }),
+    [cart, addToCart, replaceCart, removeFromCart, updateQuantity, clearCart, totalItems, subtotal]
   );
-  const summary = useMemo(() => ({ totalItems, subtotal }), [totalItems, subtotal]);
 
   return (
-    <CartActionsContext.Provider value={actions}>
-      <CartItemsContext.Provider value={cart}>
-        <CartSummaryContext.Provider value={summary}>
-          {children}
-        </CartSummaryContext.Provider>
-      </CartItemsContext.Provider>
-    </CartActionsContext.Provider>
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
   );
-};
-
-export const useCartItems = () => {
-  const context = useContext(CartItemsContext);
-  if (!context) throw new Error('useCartItems must be used within a CartProvider');
-  return context;
-};
-
-export const useCartActions = () => {
-  const context = useContext(CartActionsContext);
-  if (!context) throw new Error('useCartActions must be used within a CartProvider');
-  return context;
-};
-
-export const useCartSummary = () => {
-  const context = useContext(CartSummaryContext);
-  if (!context) throw new Error('useCartSummary must be used within a CartProvider');
-  return context;
 };
 
 export const useCart = () => {
-  const cart = useCartItems();
-  const actions = useCartActions();
-  const summary = useCartSummary();
-
-  return useMemo(
-    () => ({ cart, ...actions, ...summary }),
-    [actions, cart, summary]
-  );
+  const context = useContext(CartContext);
+  if (!context) throw new Error('useCart must be used within a CartProvider');
+  return context;
 };

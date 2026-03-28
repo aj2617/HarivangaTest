@@ -13,7 +13,7 @@ import {
   Plus,
   Zap,
 } from 'lucide-react';
-import { useCartActions } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import { getCachedStorefrontProducts } from '../hooks/useProducts';
 import { fetchStorefrontProductById } from '../lib/publicProducts';
 import { hasSupabaseConfig } from '../lib/env';
@@ -25,7 +25,7 @@ import { getLocalDevProducts } from '../lib/localDevProducts';
 export const ProductDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, replaceCart } = useCartActions();
+  const { addToCart, replaceCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [productLoading, setProductLoading] = useState(true);
 

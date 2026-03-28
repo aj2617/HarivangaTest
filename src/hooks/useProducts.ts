@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   getLocalDevProducts,
   getMockProducts,
@@ -72,47 +72,25 @@ function getCacheKey(search: string, variety: string, limit?: number) {
   return JSON.stringify(['storefront-products', search, variety, limit ?? null]);
 }
 
-function filterProducts(products: Product[], search: string, variety: string, limit?: number) {
-  const normalizedSearch = search.toLowerCase();
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      normalizedSearch.length === 0 ||
-      product.name.toLowerCase().includes(normalizedSearch) ||
-      product.variety.toLowerCase().includes(normalizedSearch);
-    const matchesVariety = variety.length === 0 || variety === 'All' || product.variety === variety;
-
-    return matchesSearch && matchesVariety;
-  });
-
-  return typeof limit === 'number' ? filteredProducts.slice(0, limit) : filteredProducts;
-}
-
 export function getCachedStorefrontProducts() {
   return readCachedProducts() ?? [];
 }
 
 export function useProducts(options?: UseProductsOptions) {
   const localDevMode = isLocalDevAdminMode();
-  const search = useMemo(() => options?.search?.trim() ?? '', [options?.search]);
-  const variety = useMemo(() => options?.variety?.trim() ?? '', [options?.variety]);
+  const search = options?.search?.trim() ?? '';
+  const variety = options?.variety?.trim() ?? '';
   const limit = options?.limit;
   const isDefaultQuery = search.length === 0 && variety.length === 0 && limit == null;
   const cacheKey = getCacheKey(search, variety, limit);
-  const initialProducts = useMemo(() => {
+  const [products, setProducts] = useState<Product[]>(() => {
     if (isDefaultQuery) {
       return readCachedProducts() ?? [];
     }
 
     return memoryCache.get(cacheKey)?.products ?? [];
-  }, [cacheKey, isDefaultQuery]);
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [loading, setLoading] = useState(() => {
-    if (!localDevMode && !hasSupabaseConfig) {
-      return true;
-    }
-
-    return initialProducts.length === 0;
   });
+  const [loading, setLoading] = useState(localDevMode || hasSupabaseConfig);
   const [error, setError] = useState<string | null>(hasSupabaseConfig ? null : 'Store configuration is incomplete.');
 
   useEffect(() => {
@@ -156,12 +134,7 @@ export function useProducts(options?: UseProductsOptions) {
       }
 
       if (localDevMode) {
-        const nextProducts = filterProducts(await getLocalDevProducts(), search, variety, limit);
-        memoryCache.set(cacheKey, { products: nextProducts, timestamp: Date.now() });
-        if (isDefaultQuery) {
-          writeCachedProducts(nextProducts);
-        }
-        setProducts(nextProducts);
+        setProducts(await getLocalDevProducts());
         setLoading(false);
         setError(null);
         return;

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mapOrderToRow, supabase } from '../supabase';
-import { useCartActions, useCartItems, useCartSummary } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { hasSupabaseConfig } from '../lib/env';
 import { canUseLocalOrderFallback, saveLocalDevOrder } from '../lib/localDevOrders';
@@ -31,9 +31,7 @@ const normalizePhoneNumber = (phone: string) => phone.replace(/\D/g, '');
 const SEND_MONEY_NUMBER = '+8801342262821';
 const MOBILE_PAYMENT_CONFIRMATION_AMOUNT = 120;
 export const Checkout: React.FC = () => {
-  const cart = useCartItems();
-  const { subtotal } = useCartSummary();
-  const { clearCart } = useCartActions();
+  const { cart, subtotal, clearCart } = useCart();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
