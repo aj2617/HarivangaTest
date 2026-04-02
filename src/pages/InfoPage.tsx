@@ -26,7 +26,7 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
       {
         heading: 'শুরুর গল্প',
         body:
-          'রংপুরের মিঠাপুকুর উপজেলার, খোড়াগাছ ইউনিয়নের, পদাগন্জের তেকানির মোড় গ্রামে বহু বছর আগে (মো: নাফাল উদ্দিন পাইকার) তাঁর জমিতে একটি আমগাছের চারা রোপণ করেন। প্রতিকূল মাটি, তীব্র রোদ আর খরার মধ্যেও তিনি বিশেষ ব্যবস্থায় গাছের গোড়ায় ধীরে ধীরে পানি দিতেন। সেই যত্নের ফলেই জন্ম নেয় এমন একটি পরিপূর্ণ আমগাছ। সেই গাছ থেকে ফল আসে, যার স্বাদ, ঘ্রাণ ও রসালত্ব গ্রামবাসীকে প্রথম ফলনেই বিস্মিত করেছিল। সেটিই ছিল বিখ্যাত হাড়িভাঙ্গা আম। যেটি কী না হাঁড়িতে পরে হাঁড়িকে ভেঙ্গে দিয়েছিল। সেই থেকে এর প্রচলন চলমান।',
+          'রংপুরের মিঠাপুকুর উপজেলার, খোড়াগাছ ইউনিয়নের, পদাগঞ্জের তেকানির মোড় গ্রামে বহু বছর আগে (মো: নাফাল উদ্দিন পাইকার) তাঁর জমিতে একটি আমগাছের চারা রোপণ করেন। প্রতিকূল মাটি, তীব্র রোদ আর খরার মধ্যেও তিনি বিশেষ ব্যবস্থায় গাছের গোড়ায় ধীরে ধীরে পানি দিতেন। সেই যত্নের ফলেই জন্ম নেয় এমন একটি পরিপূর্ণ আমগাছ। সেই গাছ থেকে ফল আসে, যার স্বাদ, ঘ্রাণ ও রসালত্ব গ্রামবাসীকে প্রথম ফলনেই বিস্মিত করেছিল। সেটিই ছিল বিখ্যাত হাড়িভাঙ্গা আম। যেটি কী না হাঁড়িতে পরে হাঁড়িকে ভেঙ্গে দিয়েছিল। সেই থেকে এর প্রচলন চলমান।',
       },
       {
         heading: 'লাল মাটির স্বাদ',
@@ -41,7 +41,7 @@ const INFO_PAGE_CONTENT: Record<string, InfoPageContent> = {
       {
         heading: 'Harivanga.com-এর প্রতিশ্রুতি',
         body:
-          'আমরা পদাগঞ্জের বিশ্বস্ত বাগান থেকে বাছাই করা হাড়িভাঙ্গা সংগ্রহ করি, যাতে মধ্যস্বত্বভোগীর কারণে মান বা সতেজতায় কোনো ঘাটতি না থাকে। প্রতিটি চালানে আমরা গুরুত্ব দিই আসল স্বাদ, নিরাপদ সংগ্রহ এবং গ্রাহকের হাতে সর্বোচ্চ মানের আম পৌঁছে দেওয়ায়।',
+          'আমরা পদাগঞ্জের নিজস্ব  বাগান থেকে বাছাই করা হাড়িভাঙ্গা সংগ্রহ করি, যাতে মধ্যস্বত্বভোগীর কারণে মান বা সতেজতায় কোনো ঘাটতি না থাকে। প্রতিটি চালানে আমরা গুরুত্ব দিই আসল স্বাদ, নিরাপদ সংগ্রহ এবং গ্রাহকের হাতে সর্বোচ্চ মানের আম পৌঁছে দেওয়ায়।',
       },
     ],
   },
@@ -137,29 +137,79 @@ export const InfoPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen ${isAboutPage ? 'bg-[radial-gradient(circle_at_top,#fff7eb_0%,#fffdf9_38%,#f7f7f5_100%)]' : 'bg-gray-50'}`}>
-      <section className="bg-mango-dark text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <p className="text-xs font-bold uppercase tracking-[0.35em] text-mango-yellow/80">{page.eyebrow}</p>
-          <h1 className="mt-4 text-4xl sm:text-5xl font-black max-w-3xl leading-tight">{page.title}</h1>
-          <p className="mt-6 max-w-2xl text-white/75 text-base sm:text-lg leading-relaxed">{page.intro}</p>
+      {isAboutPage && (
+        <section className="px-4 pb-4 pt-6 sm:px-6 sm:pb-5 sm:pt-8 lg:px-8">
+          <div className="mx-auto max-w-[1240px] overflow-hidden rounded-[2.2rem] border border-[#ead8be] bg-[linear-gradient(180deg,#fff8ee_0%,#fffdf8_100%)] shadow-[0_20px_50px_rgba(151,95,20,0.12)]">
+            <div className="grid lg:grid-cols-[320px_minmax(0,1fr)]">
+              <div className="bg-[linear-gradient(180deg,#9c5400_0%,#c66c04_100%)] px-7 py-9 text-white sm:px-9">
+                <p className="text-xs font-bold uppercase tracking-[0.34em] text-[#ffd79e]">Owner&apos;s Note</p>
+                <h2 className="mt-5 text-3xl font-black leading-tight sm:text-4xl">আমার পরিচয়</h2>
+                <p className="mt-6 max-w-[220px] text-base leading-relaxed text-white/85">
+                  পড়াশোনার পাশাপাশি উদ্যোক্তা হওয়ার পথে আমার ছোট্ট পরিচয় ও লক্ষ্য।
+                </p>
+              </div>
 
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {page.highlights.map((highlight, index) => {
-              const Icon = PAGE_ICONS[index % PAGE_ICONS.length];
-              return (
-                <div key={highlight} className="rounded-3xl bg-white/10 backdrop-blur-sm px-5 py-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-mango-orange/20 flex items-center justify-center text-mango-yellow">
-                    <Icon size={18} />
+              <div className="bg-[linear-gradient(180deg,#fff8ef_0%,#fff4e8_100%)] px-7 py-9 sm:px-9 lg:px-10">
+                <div className="max-w-3xl space-y-4 text-[#6b5b49]">
+                  <p className="text-base leading-[1.4] sm:text-[1.3rem]">
+                    <span className="font-black text-[#9c5400]">নাম:</span> মো: সানবীর ইসলাম (জীম)।
+                  </p>
+
+                  <div className="space-y-0 text-base leading-[1.4] sm:text-[1.3rem]">
+                    <p><span className="font-black text-[#9c5400]">পড়াশুনা:</span> অনার্স তৃতীয়বর্ষ।</p>
+                    <p className="block text-sm leading-[1.25] text-[#847361] sm:text-[1.05rem]">(গণিত বিভাগ)</p>
+                    <p>রংপুর সরকারি কলেজ।</p>
                   </div>
-                  <span className="text-sm font-semibold">{highlight}</span>
+
+                  <p className="pt-1 text-base leading-[1.45] sm:text-[1.3rem]">
+                    পড়াশুনার পাশাপাশি নিজেকে উদ্যোক্তা হিসেবে গড়ে তুলতে চাই। সকলের সহযোগীতা আমার একান্ত কাম্য। ধন্যবাদ।
+                  </p>
                 </div>
-              );
-            })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className={isAboutPage ? 'px-4 pb-4 sm:px-6 sm:pb-5 lg:px-8' : 'bg-mango-dark text-white'}>
+        <div className={isAboutPage ? 'relative mx-auto max-w-[1240px] overflow-hidden rounded-[2.2rem] border border-[#efdec5] bg-[linear-gradient(180deg,#fff3df_0%,#fffaf2_52%,#fffdf9_100%)] text-[#2c1a0d] shadow-[0_18px_42px_rgba(151,95,20,0.10)]' : 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'}>
+          {isAboutPage && (
+            <>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,184,77,0.22),transparent_34%)]" />
+              <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(201,109,4,0.12),transparent_70%)] blur-3xl" />
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(191,120,28,0.45),transparent)]" />
+            </>
+          )}
+          <div className={`${isAboutPage ? 'px-7 py-10 sm:px-9 sm:py-12 lg:px-10' : 'py-10 sm:py-14'} relative z-10`}>
+            <p className={`text-xs font-bold uppercase tracking-[0.35em] ${isAboutPage ? 'text-[#b8741c]' : 'text-mango-yellow/80'}`}>{page.eyebrow}</p>
+            <h1 className={`mt-3 max-w-3xl text-3xl font-black leading-tight sm:text-4xl ${isAboutPage ? 'text-[#2b1609]' : ''}`}>{page.title}</h1>
+            <p className={`mt-4 max-w-2xl text-sm leading-relaxed sm:text-base ${isAboutPage ? 'text-[#6d5642]' : 'text-white/75'}`}>{page.intro}</p>
+
+            <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {page.highlights.map((highlight, index) => {
+                const Icon = PAGE_ICONS[index % PAGE_ICONS.length];
+                return (
+                  <div
+                    key={highlight}
+                    className={`flex items-center gap-3 rounded-3xl px-4 py-3 ${
+                      isAboutPage
+                        ? 'border border-[#eedcc1] bg-white/72 shadow-[0_16px_36px_rgba(118,73,12,0.08)] backdrop-blur-sm'
+                        : 'bg-white/10 backdrop-blur-sm'
+                    }`}
+                  >
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${isAboutPage ? 'bg-[#fff0da] text-[#c06d05]' : 'bg-mango-orange/20 text-mango-yellow'}`}>
+                      <Icon size={18} />
+                    </div>
+                    <span className={`text-sm font-semibold ${isAboutPage ? 'text-[#4d3827]' : ''}`}>{highlight}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 [content-visibility:auto] [contain-intrinsic-size:1px_1800px]">
+      <section className="mx-auto max-w-[1240px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 [content-visibility:auto] [contain-intrinsic-size:1px_1800px]">
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-8">
           <div className="space-y-6">
             {page.sections.map((section, index) => {
@@ -222,10 +272,10 @@ export const InfoPage: React.FC = () => {
             }`}
           >
             {isAboutPage && (
-              <div className="mb-6 rounded-[1.75rem] bg-mango-dark px-5 py-5 text-white">
-                <p className="text-xs font-bold uppercase tracking-[0.32em] text-mango-yellow/80">From Podaganj</p>
-                <p className="mt-3 text-2xl font-black leading-tight">Authentic Harivanga, rooted in Rangpur&apos;s red soil.</p>
-                <p className="mt-3 text-sm leading-relaxed text-white/75">
+              <div className="mb-6 rounded-[1.75rem] border border-[#efd7b7] bg-[linear-gradient(180deg,#fff7ed_0%,#ffefd9_100%)] px-5 py-5 text-[#2d1a0d] shadow-[0_16px_36px_rgba(151,95,20,0.10)]">
+                <p className="text-xs font-bold uppercase tracking-[0.32em] text-[#b8741c]">From Podaganj</p>
+                <p className="mt-3 text-2xl font-black leading-tight text-[#2b1609]">Authentic Harivanga, rooted in Rangpur&apos;s red soil.</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#6f5842]">
                   Tree-ripened, chemical-free, and sourced from trusted orchard partners in the Harivanga heartland.
                 </p>
               </div>
@@ -237,7 +287,7 @@ export const InfoPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm font-bold text-mango-dark">Harivanga.com</p>
-                <p className="text-sm text-gray-500 mt-1">House 12, Road 5, Dhanmondi, Dhaka, Bangladesh</p>
+                <p className="mt-1 text-sm text-gray-500">Podagonj, Mithapukur, Rangpur, Bangladesh</p>
               </div>
             </div>
 
