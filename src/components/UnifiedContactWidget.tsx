@@ -29,6 +29,13 @@ type WidgetMessage = ChatAssistantMessage & {
   id: string;
 };
 
+const GENERIC_ASSISTANT_ERROR =
+  'এই মুহূর্তে Store assistant ব্যস্ত আছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা WhatsApp এ যোগাযোগ করুন।';
+
+function getFriendlyAssistantError(_error: unknown) {
+  return GENERIC_ASSISTANT_ERROR;
+}
+
 function createMessage(role: WidgetMessage['role'], content: string): WidgetMessage {
   return {
     id: `${role}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -113,7 +120,8 @@ export const UnifiedContactWidget: React.FC = () => {
 
       setMessages((current) => [...current, createMessage('assistant', reply)]);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'এই মুহূর্তে assistant উত্তর দিতে পারছে না।');
+      console.error('Chat assistant request failed', requestError);
+      setError(getFriendlyAssistantError(requestError));
     } finally {
       setIsLoading(false);
     }
@@ -275,3 +283,4 @@ export const UnifiedContactWidget: React.FC = () => {
     </div>
   );
 };
+
