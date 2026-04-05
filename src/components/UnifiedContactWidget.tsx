@@ -267,7 +267,7 @@ export const UnifiedContactWidget: React.FC = () => {
           setIsMenuOpen((current) => !current);
           setIsChatOpen(false);
         }}
-        className="ml-auto flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ff9f5a_0%,#ff6b35_58%,#d85927_100%)] text-white shadow-[0_16px_34px_rgba(255,107,53,0.32)] transition hover:-translate-y-0.5"
+        className="widget-attention ml-auto flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ff9f5a_0%,#ff6b35_58%,#d85927_100%)] text-white shadow-[0_16px_34px_rgba(255,107,53,0.32)] transition hover:-translate-y-0.5"
         aria-label={isMenuOpen ? 'Close contact options' : 'Open contact options'}
       >
         {isMenuOpen ? <X size={19} className="text-[#fff1df]" /> : <MessageCircleMore size={18} className="text-[#fff1df]" />}
