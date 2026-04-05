@@ -35,23 +35,23 @@ export const ProductListing: React.FC = () => {
             <p className="text-sm text-gray-500 sm:text-base">Discover authentic Harivanga and premium mangoes from Podagonj, Mithapukur, Rangpur.</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-            <div className="relative flex-grow md:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <div className="flex w-full items-center gap-3 md:w-auto">
+            <div className="relative min-w-0 flex-1 md:w-72 md:flex-none">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
                 type="text"
                 placeholder="Search variety..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20 focus:border-mango-orange transition-all"
+                className="h-12 w-full rounded-xl border border-gray-200 bg-white py-2 pl-10 pr-3 text-sm focus:border-mango-orange focus:outline-none focus:ring-2 focus:ring-mango-orange/20 transition-all"
               />
             </div>
-            <div className="relative">
-              <SlidersHorizontal className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+            <div className="relative w-32 shrink-0">
+              <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <select
                 value={selectedVariety}
                 onChange={(e) => setSelectedVariety(e.target.value)}
-                className="appearance-none pl-12 pr-10 py-3 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-mango-orange/20 focus:border-mango-orange transition-all cursor-pointer"
+                className="h-12 w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2 pl-10 pr-8 text-sm focus:border-mango-orange focus:outline-none focus:ring-2 focus:ring-mango-orange/20 transition-all"
               >
                 {varieties.map(v => (
                   <option key={v} value={v}>{v}</option>
@@ -70,7 +70,7 @@ export const ProductListing: React.FC = () => {
             <p className="text-gray-500">Fetching the latest product list.</p>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 [content-visibility:auto] [contain-intrinsic-size:1px_1400px]">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-8 [content-visibility:auto] [contain-intrinsic-size:1px_1400px]">
             {products.map((product, index) => (
               <div
                 key={product.id}

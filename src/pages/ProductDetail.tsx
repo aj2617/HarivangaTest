@@ -176,10 +176,10 @@ export const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div className="space-y-4 fade-up-enter">
-            <div className="relative aspect-square rounded-3xl overflow-hidden bg-gray-100 group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="space-y-3 fade-up-enter sm:space-y-4">
+            <div className="relative mx-auto aspect-[4/5] max-w-[320px] rounded-3xl overflow-hidden bg-gray-100 group sm:max-w-none sm:aspect-square">
               <img
                 src={getDisplayImageSrc(selectedImage || product.image)}
                 alt={product.name}
@@ -190,7 +190,7 @@ export const ProductDetail: React.FC = () => {
                 height={960}
                 sizes="(min-width: 1024px) 50vw, 100vw"
               />
-              <div className="absolute top-6 left-6 flex flex-col gap-2">
+              <div className="absolute left-4 top-4 flex flex-col gap-2 sm:left-6 sm:top-6">
                 <span className="bg-mango-orange text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg">
                   {product.variety}
                 </span>
@@ -201,7 +201,7 @@ export const ProductDetail: React.FC = () => {
             </div>
 
             {galleryImages.length > 1 && (
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3">
                 {galleryImages.map((image, index) => {
                   const isActive = image === (selectedImage || product.image);
                   return (
@@ -209,7 +209,7 @@ export const ProductDetail: React.FC = () => {
                       key={`${image}-${index}`}
                       type="button"
                       onClick={() => setSelectedImage(image)}
-                      className={`overflow-hidden rounded-2xl border-2 ${isActive ? 'border-mango-orange' : 'border-transparent'}`}
+                      className={`mx-auto w-full max-w-[100px] overflow-hidden rounded-2xl border-2 ${isActive ? 'border-mango-orange' : 'border-transparent'} sm:max-w-none`}
                     >
                       <img
                         src={getThumbnailImageSrc(image)}
@@ -229,33 +229,35 @@ export const ProductDetail: React.FC = () => {
           </div>
 
           <div className="flex flex-col">
-            <div className="flex items-center gap-2 text-mango-yellow mb-4">
+            <div className="mb-3 flex items-center gap-1.5 text-mango-yellow">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} fill={i < 4 ? 'currentColor' : 'none'} />
+                  <Star key={i} size={14} fill={i < 4 ? 'currentColor' : 'none'} />
                 ))}
               </div>
               <span className="text-sm font-bold text-mango-dark">4.8</span>
-              <span className="text-sm text-gray-400">(128 Reviews)</span>
+              <span className="text-xs text-gray-400 sm:text-sm">(128 Reviews)</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-black text-mango-dark mb-4 leading-tight">{product.name}</h1>
+            <h1 className="mb-3 break-words text-2xl font-black leading-tight text-mango-dark sm:text-3xl md:text-4xl">
+              {product.name}
+            </h1>
 
-            <p className="text-gray-500 text-lg leading-relaxed mb-8">{product.description}</p>
+            <p className="mb-5 text-sm leading-relaxed text-gray-500 sm:text-base">{product.description}</p>
 
-            <div className="grid grid-cols-2 gap-6 mb-10 [content-visibility:auto] [contain-intrinsic-size:1px_220px]">
-              <div className="p-4 bg-mango-yellow/5 rounded-2xl border border-mango-yellow/10">
-                <span className="text-xs text-gray-400 block mb-1">Taste Profile</span>
-                <span className="font-bold text-sm">{product.tasteProfile}</span>
+            <div className="mb-7 grid grid-cols-2 gap-3 sm:gap-4 [content-visibility:auto] [contain-intrinsic-size:1px_220px]">
+              <div className="rounded-2xl border border-mango-yellow/10 bg-mango-yellow/5 p-3 sm:p-4">
+                <span className="mb-1 block text-[11px] text-gray-400 sm:text-xs">Taste Profile</span>
+                <span className="break-words text-sm font-bold">{product.tasteProfile}</span>
               </div>
-              <div className="p-4 bg-mango-orange/5 rounded-2xl border border-mango-orange/10">
-                <span className="text-xs text-gray-400 block mb-1">Availability</span>
-                <span className="font-bold text-sm">{product.isAvailable ? 'In Season' : 'Out of Season'}</span>
+              <div className="rounded-2xl border border-mango-orange/10 bg-mango-orange/5 p-3 sm:p-4">
+                <span className="mb-1 block text-[11px] text-gray-400 sm:text-xs">Availability</span>
+                <span className="text-sm font-bold">{product.isAvailable ? 'In Season' : 'Out of Season'}</span>
               </div>
             </div>
 
-            <div className="mb-10 [content-visibility:auto] [contain-intrinsic-size:1px_200px]">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Select Weight</h3>
+            <div className="mb-8 [content-visibility:auto] [contain-intrinsic-size:1px_200px]">
+              <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 sm:text-sm">Select Weight</h3>
               <div className="flex flex-wrap gap-3">
                 {product.variants.map((v) => (
                   <button
@@ -273,35 +275,41 @@ export const ProductDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
-              <div className="flex items-center bg-gray-100 rounded-2xl p-1 w-full sm:w-auto">
+            <div className="mb-10">
+              <div className="mb-3 flex items-center gap-3 sm:gap-5">
+                <span className="shrink-0 text-[15px] font-medium text-mango-dark sm:text-lg">Quantity:</span>
+                <div className="flex min-w-0 flex-1 items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 sm:max-w-[220px]">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-3 hover:bg-white rounded-xl transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-mango-dark transition-colors hover:bg-gray-200"
                 >
-                  <Minus size={20} />
+                  <Minus size={18} />
                 </button>
-                <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="p-3 hover:bg-white rounded-xl transition-colors">
-                  <Plus size={20} />
+                <span className="min-w-[24px] text-center text-xl font-medium text-mango-dark">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-mango-dark transition-colors hover:bg-gray-200"
+                >
+                  <Plus size={18} />
                 </button>
+                </div>
               </div>
 
-              <div className="grid w-full flex-grow grid-cols-1 gap-3 lg:grid-cols-2">
+              <div className="grid w-full flex-grow grid-cols-2 gap-2.5 sm:gap-3">
                 <button
                   onClick={handleBuyNow}
                   disabled={!product.isAvailable}
-                  className="w-full bg-mango-dark hover:bg-mango-dark/90 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-mango-dark/10 disabled:bg-gray-200 disabled:shadow-none"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-mango-dark px-2.5 py-3 text-[13px] font-bold text-white transition-all shadow-lg shadow-mango-dark/10 hover:bg-mango-dark/90 disabled:bg-gray-200 disabled:shadow-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm"
                 >
-                  <Zap size={20} />
+                  <Zap size={16} className="shrink-0 sm:h-[18px] sm:w-[18px]" />
                   Buy Now - {formatCurrency(totalPrice)}
                 </button>
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.isAvailable}
-                  className="w-full bg-mango-orange hover:bg-mango-orange/90 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-mango-orange/20 disabled:bg-gray-200 disabled:shadow-none"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-mango-orange px-2.5 py-3 text-[13px] font-bold text-white transition-all shadow-lg shadow-mango-orange/20 hover:bg-mango-orange/90 disabled:bg-gray-200 disabled:shadow-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm"
                 >
-                  <ShoppingCart size={20} />
+                  <ShoppingCart size={16} className="shrink-0 sm:h-[18px] sm:w-[18px]" />
                   Add to Cart - {formatCurrency(totalPrice)}
                 </button>
               </div>
@@ -309,9 +317,9 @@ export const ProductDetail: React.FC = () => {
 
             <button
               onClick={handleWhatsAppOrder}
-              className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-green-500/20 mb-12"
+              className="-mt-4 mb-12 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white transition-all shadow-lg shadow-green-500/20 hover:bg-[#25D366]/90 sm:py-3.5 sm:text-base"
             >
-              <MessageCircle size={20} />
+              <MessageCircle size={18} className="shrink-0" />
               Order via WhatsApp
             </button>
 
