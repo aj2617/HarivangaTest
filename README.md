@@ -11,34 +11,30 @@
 
 Local product/order fallbacks and the admin test login only run on localhost in development mode.
 
-## Deploy To Namecheap
+## Deploy To Namecheap as Node Server
 
-- Build command: `npm run build`
-- Publish directory: `dist`
-- Upload all files from `dist` into your Namecheap hosting folder (usually `public_html` or the target site folder).
-- `public/.htaccess` is included in the build output and rewrites SPA routes to `index.html` so direct refreshes and deep links work.
-- Keep your Supabase settings as build-time environment variables when generating the production build.
+This app runs as a Node.js server that serves the built Vite React frontend.
 
-If you host this app in a subfolder, `vite.config.ts` is already configured with `base: './'` so built assets resolve using relative URLs.
+### Setup in cPanel
 
-### Deploy Automatically from GitHub to Namecheap
+1. Go to **Web Applications** (or **Create Application**)
+2. Configure the app:
+   - **Node.js version:** 20.x
+   - **Application mode:** Development (or Production)
+   - **Application root:** `/home/bongcgmc/repositories/HarivangaTest`
+   - **Application startup file:** `server.js`
+   - **Application URL:** `banglamail.xyz`
+3. Click **Create** or **Save**
+4. Go to **Git Version Control**
+5. Find **HarivangaTest** repository
+6. Click **Pull or Deploy**
+7. Click **Update from Remote** then **Deploy HEAD Commit**
+8. Wait for deployment to complete
+9. Open **banglamail.xyz** in your browser
 
-This repo includes a GitHub Actions workflow at `.github/workflows/deploy.yml` that:
+The `server.js` file handles all requests and serves the built React app from `dist/`. SPA routing is handled automatically.
 
-- checks out the repo on push to `main`
-- installs dependencies using `npm ci`
-- runs `npm run build`
-- deploys `dist/` to your Namecheap hosting folder via FTPS
-
-Set the following GitHub repository secrets before using the workflow:
-
-- `FTP_HOST` — your Namecheap server host
-- `FTP_USERNAME` — your FTP/SFTP username
-- `FTP_PASSWORD` — your FTP/SFTP password
-
-If your site directory is not `/public_html`, update `server-dir` in `.github/workflows/deploy.yml`.
-
-> Note: The Supabase Edge functions and database setup are separate from Namecheap static hosting. The front-end deploys as a static site while Supabase remains your backend.
+Keep your Supabase environment variables available during the build process.
 
 ## (Optional) Netlify
 
