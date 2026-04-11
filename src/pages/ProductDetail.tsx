@@ -298,7 +298,7 @@ export const ProductDetail: React.FC = () => {
                 <button
                   onClick={handleBuyNow}
                   disabled={!product.isAvailable}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-mango-dark px-2.5 py-3 text-[13px] font-bold text-white transition-all shadow-lg shadow-mango-dark/10 hover:bg-mango-dark/90 disabled:bg-gray-200 disabled:shadow-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-mango-dark px-2.5 py-3 text-[13px] font-bold text-white transition-all shadow-lg shadow-mango-dark/10 hover:bg-mango-dark/90 disabled:bg-gray-200 disabled:shadow-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm btn-shake"
                 >
                   <Zap size={16} className="shrink-0 sm:h-[18px] sm:w-[18px]" />
                   Buy Now - {formatCurrency(totalPrice)}
