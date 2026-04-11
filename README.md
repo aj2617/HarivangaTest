@@ -21,6 +21,23 @@ Local product/order fallbacks and the admin test login only run on localhost in 
 
 If you host this app in a subfolder, `vite.config.ts` is already configured with `base: './'` so built assets resolve using relative URLs.
 
+### Deploy Automatically from GitHub to Namecheap
+
+This repo includes a GitHub Actions workflow at `.github/workflows/deploy.yml` that:
+
+- checks out the repo on push to `main`
+- installs dependencies using `npm ci`
+- runs `npm run build`
+- deploys `dist/` to your Namecheap hosting folder via FTPS
+
+Set the following GitHub repository secrets before using the workflow:
+
+- `FTP_HOST` — your Namecheap server host
+- `FTP_USERNAME` — your FTP/SFTP username
+- `FTP_PASSWORD` — your FTP/SFTP password
+
+If your site directory is not `/public_html`, update `server-dir` in `.github/workflows/deploy.yml`.
+
 > Note: The Supabase Edge functions and database setup are separate from Namecheap static hosting. The front-end deploys as a static site while Supabase remains your backend.
 
 ## (Optional) Netlify
