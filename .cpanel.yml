@@ -1,0 +1,7 @@
+deployment:
+  tasks:
+    - export NODE_ENV=production
+    - npm install
+    - npm run build
+    - rm -rf /home/bongcgmc/public_html/*
+    - cp -r dist/* /home/bongcgmc/public_html/
