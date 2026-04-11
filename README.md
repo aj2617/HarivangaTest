@@ -11,14 +11,21 @@
 
 Local product/order fallbacks and the admin test login only run on localhost in development mode.
 
-## Deploy To Netlify
+## Deploy To Namecheap
 
 - Build command: `npm run build`
 - Publish directory: `dist`
-- Node version: `20`
-- SPA redirect is configured in `netlify.toml` so direct visits and refreshes on routes like `/products` or `/admin` resolve to `index.html`
+- Upload all files from `dist` into your Namecheap hosting folder (usually `public_html` or the target site folder).
+- `public/.htaccess` is included in the build output and rewrites SPA routes to `index.html` so direct refreshes and deep links work.
+- Keep your Supabase settings as build-time environment variables when generating the production build.
 
-Add the same Supabase environment values in Netlify.
+If you host this app in a subfolder, `vite.config.ts` is already configured with `base: './'` so built assets resolve using relative URLs.
+
+> Note: The Supabase Edge functions and database setup are separate from Namecheap static hosting. The front-end deploys as a static site while Supabase remains your backend.
+
+## (Optional) Netlify
+
+The project also includes `netlify.toml` for Netlify deployment, but Namecheap hosting does not use that configuration.
 
 Enable email/password authentication in Supabase Authentication before going live.
 
