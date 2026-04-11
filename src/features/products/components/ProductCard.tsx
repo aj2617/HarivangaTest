@@ -1,32 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Star, MapPin, Image as ImageIcon } from 'lucide-react';
-import { Product } from '../types';
-import { useCart } from '../context/CartContext';
-import { formatCurrency } from '../lib/format';
-import { getThumbnailImageSrc } from '../lib/imageSources';
+import { ShoppingCart, Image as ImageIcon } from 'lucide-react';
+import { Product } from '../../../types';
+import { useCart } from '../../../context/CartContext';
+import { formatCurrency } from '../../../lib/format';
+import { getThumbnailImageSrc } from '../../../lib/imageSources';
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCardComponent: React.FC<ProductCardProps> = ({ product, priority = false }) => {
   const { addToCart } = useCart();
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
-  const [showDelayedPlaceholder, setShowDelayedPlaceholder] = useState(false);
-
-  useEffect(() => {
-    setImageLoaded(false);
-    setImageFailed(false);
-    setShowDelayedPlaceholder(false);
-
-    const timeout = window.setTimeout(() => {
-      setShowDelayedPlaceholder(true);
-    }, 350);
-
-    return () => window.clearTimeout(timeout);
-  }, [product.id, product.image]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,7 +31,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group card-hover-lift rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-xl">
       <Link to={`/product/${product.id}`} className="block relative aspect-square overflow-hidden">
-        {(imageFailed || (!imageLoaded && showDelayedPlaceholder)) && (
+        {imageFailed && (
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-[#fff4de] via-[#fffaf1] to-[#f4ede1]" />
             <div className="absolute inset-0 transition-opacity duration-300 opacity-100">
@@ -54,7 +41,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-mango-dark">{product.name}</p>
-                  <p className="mt-1 text-xs text-gray-500">{imageFailed ? 'Image unavailable' : 'Loading product photo...'}</p>
+                  <p className="mt-1 text-xs text-gray-500">Image unavailable</p>
                 </div>
               </div>
             </div>
@@ -63,21 +50,18 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
         <img
           src={getThumbnailImageSrc(product.image)}
           alt={product.name}
-          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imageLoaded && !imageFailed ? 'opacity-100' : imageFailed ? 'opacity-0' : 'opacity-100'}`}
-          loading="lazy"
+          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imageFailed ? 'opacity-0' : 'opacity-100'}`}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           width={320}
           height={320}
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           onLoad={() => {
-            setImageLoaded(true);
             setImageFailed(false);
-            setShowDelayedPlaceholder(false);
           }}
           onError={() => {
-            setImageLoaded(false);
             setImageFailed(true);
-            setShowDelayedPlaceholder(true);
           }}
         />
         {!product.isAvailable && (
@@ -93,23 +77,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
       </Link>
 
       <div className="p-5">
-        <div className="flex items-center gap-1 text-mango-yellow mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={12} fill={i < 4 ? "currentColor" : "none"} />
-          ))}
-          <span className="text-[10px] text-gray-400 ml-1">(4.8)</span>
-        </div>
-
         <Link to={`/product/${product.id}`}>
-          <h3 className="text-lg font-bold text-mango-dark group-hover:text-mango-orange transition-colors mb-1">
+          <h3 className="text-lg font-bold text-mango-dark group-hover:text-mango-orange transition-colors mb-4">
             {product.name}
           </h3>
         </Link>
-
-        <div className="flex items-center gap-1 text-gray-400 text-xs mb-4">
-          <MapPin size={12} />
-          <span>{product.origin}</span>
-        </div>
 
         <div className="flex items-center justify-between">
           <div>

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { ProductCard } from '../components/ProductCard';
-import { useProducts } from '../hooks/useProducts';
+import { ProductCard } from '../features/products/components/ProductCard';
+import { useProducts } from '../features/products/hooks/useProducts';
 
 export const ProductListing: React.FC = () => {
   const { products: allProducts, loading } = useProducts();

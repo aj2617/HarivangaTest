@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bot, MessageCircleMore, MessageSquareText, Phone, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useProducts } from '../hooks/useProducts';
+import { useProducts } from '../features/products/hooks/useProducts';
 import {
   canUseChatAssistant,
   requestChatAssistant,

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { mapOrderRow, ORDER_SELECT, supabase } from '../supabase';
-import { getLocalDevOrderById } from '../lib/localDevOrders';
-import { getRecentOrderById, saveRecentOrder } from '../lib/recentOrders';
-import { hasSupabaseConfig } from '../lib/env';
-import { Order } from '../types';
+import { mapOrderRow, ORDER_SELECT, supabase } from '../../../supabase';
+import { getLocalDevOrderById } from '../../../lib/localDevOrders';
+import { getRecentOrderById, saveRecentOrder } from '../../../lib/recentOrders';
+import { hasSupabaseConfig } from '../../../lib/env';
+import { Order } from '../../../types';
 
 type UseOrderLookupOptions = {
   orderId?: string;

@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, PlayCircle, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
-import { ProductCard } from '../components/ProductCard';
-import { useProducts } from '../hooks/useProducts';
-import slide1 from '../../slide1.jpeg';
-import slide2 from '../../slide2.jpeg';
-import slide3 from '../../slide3.jpeg';
-import slide4 from '../../slide4.jpeg';
-import slide5 from '../../slide5.jpeg';
-import slide6 from '../../slide6.jpeg';
-import slide7 from '../../slide7.jpeg';
-import slide8 from '../../slide8.jpeg';
-import slide9 from '../../slide9 .jpeg';
-import slide10 from '../../slide10.jpeg';
-
-const ADMIN_SETTINGS_KEY = 'harivanga_admin_settings';
-const LEGACY_ADMIN_SETTINGS_KEY = 'mangobd_admin_settings';
+import { ProductCard } from '../features/products/components/ProductCard';
+import { useProducts } from '../features/products/hooks/useProducts';
+import { ADMIN_SETTINGS_CHANGED_EVENT, ADMIN_SETTINGS_KEY, LEGACY_ADMIN_SETTINGS_KEY } from '../lib/adminSettings';
+import slide1 from '../assets/home/slide-01.jpeg';
+import slide2 from '../assets/home/slide-02.jpeg';
+import slide3 from '../assets/home/slide-03.jpeg';
+import slide4 from '../assets/home/slide-04.jpeg';
+import slide5 from '../assets/home/slide-05.jpeg';
+import slide6 from '../assets/home/slide-06.jpeg';
+import slide7 from '../assets/home/slide-07.jpeg';
+import slide8 from '../assets/home/slide-08.jpeg';
+import slide9 from '../assets/home/slide-09.jpeg';
+import slide10 from '../assets/home/slide-10.jpeg';
 
 type HomePromotion = {
   promoStories: Array<{
@@ -151,7 +149,18 @@ export const Home: React.FC = () => {
   const [activeBannerSlide, setActiveBannerSlide] = useState(0);
 
   useEffect(() => {
-    setPromotion(loadHomePromotion());
+    const syncPromotion = () => {
+      setPromotion(loadHomePromotion());
+    };
+
+    syncPromotion();
+    window.addEventListener('storage', syncPromotion);
+    window.addEventListener(ADMIN_SETTINGS_CHANGED_EVENT, syncPromotion);
+
+    return () => {
+      window.removeEventListener('storage', syncPromotion);
+      window.removeEventListener(ADMIN_SETTINGS_CHANGED_EVENT, syncPromotion);
+    };
   }, []);
 
   useEffect(() => {
@@ -302,30 +311,32 @@ export const Home: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4 lg:gap-8">
             {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} priority />
             ))}
           </div>
         </div>
       </section>
 
       {showPromotion && (
-        <section className="bg-[#fff8f1] py-20 [content-visibility:auto] [contain-intrinsic-size:1px_760px]">
+        <section className="bg-[#fff8f1] py-10 [content-visibility:auto] [contain-intrinsic-size:1px_520px]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
-              <h2 className="text-3xl font-black uppercase tracking-[0.18em] text-[#201b16] sm:text-4xl">Stories to Watch</h2>
-              <div className="mt-4 flex items-center justify-center gap-4">
-                <span className="h-px w-16 bg-[#d4c7b6]" />
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[#eadfce]">
-                  <img src="/logo.png" alt="" aria-hidden="true" className="h-7 w-7 object-contain" />
+            <div className="mx-auto mb-8 max-w-[210px] text-center sm:max-w-none">
+              <h2 className="text-[1.7rem] font-black uppercase tracking-[0.08em] leading-[1.02] text-[#201b16] sm:text-4xl sm:tracking-[0.18em]">
+                Stories to Watch
+              </h2>
+              <div className="mt-4 flex items-center justify-center gap-2.5 sm:gap-4">
+                <span className="h-px w-9 bg-[#d4c7b6] sm:w-16" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[#eadfce] sm:h-12 sm:w-12">
+                  <img src="/logo.png" alt="" aria-hidden="true" className="h-6 w-6 object-contain sm:h-7 sm:w-7" />
                 </div>
-                <span className="h-px w-16 bg-[#d4c7b6]" />
+                <span className="h-px w-9 bg-[#d4c7b6] sm:w-16" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
-              {promoStories.map((story) => {
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+              {promoStories.map((story, index) => {
                 const embedUrl = getYoutubeEmbedUrl(story.videoUrl);
                 const thumbnailUrl = getYoutubeThumbnailUrl(story.videoUrl);
                 const isOpen = Boolean(openPromoStoryIds[story.id]);
@@ -333,46 +344,32 @@ export const Home: React.FC = () => {
                 return (
                   <article
                     key={story.id}
-                    className="group overflow-hidden rounded-[32px] border border-[#eadfce] bg-[linear-gradient(180deg,#fffaf3_0%,#fff4e8_100%)] shadow-[0_24px_60px_rgba(92,66,36,0.08)] transition-transform duration-300 hover:-translate-y-1"
+                    className="overflow-hidden rounded-2xl border border-[#dfe5df] bg-white p-2 shadow-[0_8px_26px_rgba(44,62,45,0.08)]"
                   >
-                    <div className="flex items-start justify-between gap-4 bg-[linear-gradient(180deg,rgba(255,251,245,0.96)_0%,rgba(255,244,230,0.9)_100%)] px-6 pb-5 pt-6">
-                      <div className="space-y-3">
-                        <span className="inline-flex items-center rounded-full bg-[#fff2df] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-[#a35a00]">
-                          Featured Story
-                        </span>
-                        <h3 className="text-2xl font-black leading-tight text-[#201b16]">{story.title || 'Story Video'}</h3>
-                      </div>
-                      <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#fff8f1] text-mango-orange shadow-inner sm:flex">
-                        <PlayCircle size={24} />
-                      </div>
-                    </div>
-
-                    <div className="relative aspect-video overflow-hidden bg-[#201b16]">
+                    <div className="relative aspect-video overflow-hidden rounded-xl bg-[#1d241e]">
                       {!isOpen ? (
                         <button
                           type="button"
                           onClick={() => setOpenPromoStoryIds((current) => ({ ...current, [story.id]: true }))}
-                          className="relative flex h-full w-full items-end overflow-hidden text-left text-white"
+                          aria-label={story.title ? `Play ${story.title}` : 'Play story video'}
+                          className="relative block h-full w-full overflow-hidden"
                         >
                           {thumbnailUrl ? (
                             <img
                               src={thumbnailUrl}
                               alt={story.title || 'Story thumbnail'}
-                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                              loading="lazy"
+                              className="absolute inset-0 h-full w-full object-cover"
+                              loading={index === 0 ? 'eager' : 'lazy'}
+                              fetchPriority={index === 0 ? 'high' : 'auto'}
                               decoding="async"
                             />
-                          ) : null}
-                          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,16,12,0.08)_0%,rgba(21,16,12,0.38)_42%,rgba(21,16,12,0.88)_100%)]" />
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,176,59,0.16),transparent_42%)]" />
-                          <div className="relative flex w-full items-end justify-between gap-4 px-6 py-6 sm:px-7 sm:py-7">
-                            <div className="max-w-xl">
-                              <p className="text-lg font-bold sm:text-xl">{story.title || 'Play story video'}</p>
-                            </div>
-                            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/25 bg-[#ffb03b]/20 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
-                              <PlayCircle size={40} className="text-[#ffb03b]" />
-                            </span>
-                          </div>
+                          ) : (
+                            <div className="absolute inset-0 bg-[linear-gradient(135deg,#36513f_0%,#1d241e_100%)]" />
+                          )}
+                          <div className="absolute inset-0 bg-black/15" />
+                          <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 backdrop-blur-[2px] shadow-[0_12px_24px_rgba(0,0,0,0.28)]">
+                            <span className="ml-1 block h-0 w-0 border-y-[9px] border-y-transparent border-l-[14px] border-l-white" />
+                          </span>
                         </button>
                       ) : embedUrl ? (
                         <iframe
@@ -394,13 +391,12 @@ export const Home: React.FC = () => {
                         />
                       ) : (
                         <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center text-white">
-                          <PlayCircle size={52} className="text-mango-yellow" />
-                          <p className="max-w-xl text-sm text-white/80">This story uses an external video link. Open it directly to watch.</p>
+                          <PlayCircle size={52} className="text-white/90" />
                           <a
                             href={story.videoUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-2 rounded-full bg-mango-orange px-5 py-3 text-sm font-bold text-white transition hover:bg-mango-orange/90"
+                            className="inline-flex items-center gap-2 rounded-full bg-[#ff2f1a] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e52814]"
                           >
                             Watch Video
                             <ArrowRight size={16} />
@@ -408,12 +404,6 @@ export const Home: React.FC = () => {
                         </div>
                       )}
                     </div>
-
-                    {story.description && (
-                      <div className="border-t border-[#efe5d8] bg-[linear-gradient(180deg,#fff7ed_0%,#ffefdd_100%)] px-6 py-5">
-                        <p className="text-sm leading-relaxed text-[#775f47]">{story.description}</p>
-                      </div>
-                    )}
                   </article>
                 );
               })}

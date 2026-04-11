@@ -8,7 +8,8 @@ import { getLocalDevOrders, LOCAL_DEV_ORDERS_UPDATED_EVENT, setLocalDevOrders } 
 import { notifyStorefrontProductsChanged } from '../lib/storefrontSync';
 import { optimizeProductUpload } from '../lib/imageOptimization';
 import { getThumbnailImageSrc } from '../lib/imageSources';
-import type { PromoStoryInput } from '../components/admin/AdminSettingsPanel';
+import { ADMIN_SETTINGS_KEY, LEGACY_ADMIN_SETTINGS_KEY, notifyAdminSettingsChanged } from '../lib/adminSettings';
+import type { PromoStoryInput } from '../features/admin/components/AdminSettingsPanel';
 import { BrandLogo } from '../components/BrandLogo';
 import { formatLongDate, formatOrderTimestamp, formatShortMonthDay } from '../lib/dates';
 import { 
@@ -19,10 +20,10 @@ import {
 import { canUseDevelopmentFallbacks } from '../lib/env';
 
 const AdminProductModal = lazy(() =>
-  import('../components/admin/AdminProductModal').then((module) => ({ default: module.AdminProductModal }))
+  import('../features/admin/components/AdminProductModal').then((module) => ({ default: module.AdminProductModal }))
 );
 const AdminSettingsPanel = lazy(() =>
-  import('../components/admin/AdminSettingsPanel').then((module) => ({ default: module.AdminSettingsPanel }))
+  import('../features/admin/components/AdminSettingsPanel').then((module) => ({ default: module.AdminSettingsPanel }))
 );
 
 const LOCAL_DEV_ADMIN_EMAIL = 'admin@local';
@@ -115,8 +116,6 @@ const normalizePromoStories = (value: unknown): PromoStoryInput[] => {
     .filter((story): story is PromoStoryInput => story !== null);
 };
 
-const ADMIN_SETTINGS_KEY = 'harivanga_admin_settings';
-const LEGACY_ADMIN_SETTINGS_KEY = 'mangobd_admin_settings';
 const PRODUCTS_PAGE_SIZE = 12;
 const ORDERS_PAGE_SIZE = 10;
 const PRODUCT_ORIGINS = ['Rangpur', 'Rajshahi', 'Podagonj'] as const;
@@ -730,6 +729,7 @@ export const AdminDashboard: React.FC = () => {
   const handleSaveSettings = (event: React.FormEvent) => {
     event.preventDefault();
     window.localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(settingsForm));
+    notifyAdminSettingsChanged();
     setSettingsSavedMessage('Settings saved');
   };
 
@@ -737,6 +737,7 @@ export const AdminDashboard: React.FC = () => {
     if (!window.confirm('Reset settings to default values?')) return;
     window.localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
     setSettingsForm(DEFAULT_SETTINGS);
+    notifyAdminSettingsChanged();
     setSettingsSavedMessage('Settings reset');
   };
 

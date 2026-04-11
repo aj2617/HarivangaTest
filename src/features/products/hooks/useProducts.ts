@@ -4,11 +4,11 @@ import {
   getMockProducts,
   isLocalDevAdminMode,
   LOCAL_DEV_PRODUCTS_UPDATED_EVENT,
-} from '../lib/localDevProducts';
-import { fetchStorefrontProducts } from '../lib/publicProducts';
-import { STOREFRONT_PRODUCTS_CACHE_KEY, STOREFRONT_PRODUCTS_CHANGED_EVENT } from '../lib/storefrontSync';
-import { hasSupabaseConfig } from '../lib/env';
-import { Product } from '../types';
+} from '../../../lib/localDevProducts';
+import { fetchStorefrontProducts } from '../../../lib/publicProducts';
+import { STOREFRONT_PRODUCTS_CACHE_KEY, STOREFRONT_PRODUCTS_CHANGED_EVENT } from '../../../lib/storefrontSync';
+import { hasSupabaseConfig } from '../../../lib/env';
+import { Product } from '../../../types';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const LEGACY_CACHE_KEY = STOREFRONT_PRODUCTS_CACHE_KEY;

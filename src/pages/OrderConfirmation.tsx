@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { formatCurrency } from '../lib/format';
 import { CheckCircle, Package, Truck, MessageCircle, ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useOrderLookup } from '../hooks/useOrderLookup';
+import { useOrderLookup } from '../features/orders/hooks/useOrderLookup';
 
 export const OrderConfirmation: React.FC = () => {
   const { orderId } = useParams();

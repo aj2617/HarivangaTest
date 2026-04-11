@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image as ImageIcon, Plus, Save, Trash2, X } from 'lucide-react';
-import { Product } from '../../types';
-import { getDisplayImageSrc } from '../../lib/imageSources';
+import { Product } from '../../../types';
+import { getDisplayImageSrc } from '../../../lib/imageSources';
 
 type AdminProductModalProps = {
   editingProduct: Product | null;

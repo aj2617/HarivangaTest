@@ -14,7 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { getCachedStorefrontProducts } from '../hooks/useProducts';
+import { getCachedStorefrontProducts } from '../features/products/hooks/useProducts';
 import { fetchStorefrontProductById } from '../lib/publicProducts';
 import { hasSupabaseConfig } from '../lib/env';
 import { formatCurrency } from '../lib/format';
@@ -183,7 +183,7 @@ export const ProductDetail: React.FC = () => {
               <img
                 src={getDisplayImageSrc(selectedImage || product.image)}
                 alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 decoding="async"
                 fetchPriority="high"
                 width={960}
@@ -242,7 +242,6 @@ export const ProductDetail: React.FC = () => {
             <h1 className="mb-3 break-words text-2xl font-black leading-tight text-mango-dark sm:text-3xl md:text-4xl">
               {product.name}
             </h1>
-
             <p className="mb-5 text-sm leading-relaxed text-gray-500 sm:text-base">{product.description}</p>
 
             <div className="mb-7 grid grid-cols-2 gap-3 sm:gap-4 [content-visibility:auto] [contain-intrinsic-size:1px_220px]">
@@ -263,7 +262,7 @@ export const ProductDetail: React.FC = () => {
                   <button
                     key={v.weight}
                     onClick={() => setSelectedVariant(v)}
-                    className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 ${
+                    className={`min-w-[112px] px-4 py-3 rounded-2xl font-bold text-sm transition-all border-2 ${
                       selectedVariant?.weight === v.weight
                         ? 'border-mango-orange bg-mango-orange/5 text-mango-orange shadow-md'
                         : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'
