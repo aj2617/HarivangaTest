@@ -31,7 +31,7 @@ jobs:
           cp package-lock.json deploy_ready/
 
       - name: Deploy to Namecheap via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@4.5.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
