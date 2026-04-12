@@ -38,5 +38,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: deploy_ready
-          server-dir: /public_html
+          server-dir: /harivanga-app
           git-ftp-args: --insecure
