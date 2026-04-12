@@ -22,6 +22,14 @@ jobs:
       - name: Build production site
         run: npm run build
 
+      - name: Prepare deployment folder
+        run: |
+          mkdir deploy_ready
+          cp -r dist deploy_ready/
+          cp server.js deploy_ready/
+          cp package.json deploy_ready/
+          cp package-lock.json deploy_ready/
+
       - name: Deploy to Namecheap via FTPS
         uses: SamKirkland/FTP-Deploy-Action@4.5.0
         with:
@@ -29,6 +37,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
-          local-dir: dist
+          local-dir: deploy_ready
           server-dir: /public_html
           git-ftp-args: --insecure
