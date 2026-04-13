@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, PlayCircle, ShieldCheck, Truck, Leaf, Home as HomeIcon } from 'lucide-react';
 import { ProductCard } from '../features/products/components/ProductCard';
@@ -52,6 +52,16 @@ const normalizePromoStories = (value: unknown): HomePromotion['promoStories'] =>
 };
 
 const HOME_BANNER_SLIDES = [slide9, slide1, slide2, slide3, slide4, slide5, slide6, slide7, slide8, slide10];
+
+const HERO_TEXT = {
+  badge: import.meta.env.VITE_HOME_HERO_BADGE?.trim() || 'Season 2026 Is Here',
+  lineOne: import.meta.env.VITE_HOME_HERO_LINE_ONE?.trim() || 'Farm Fresh',
+  highlight: import.meta.env.VITE_HOME_HERO_HIGHLIGHT?.trim() || 'Mangoes',
+  lineTwo: import.meta.env.VITE_HOME_HERO_LINE_TWO?.trim() || 'for Every Doorstep',
+  description:
+    import.meta.env.VITE_HOME_HERO_DESCRIPTION?.trim() ||
+    "Straight from Podaganj's legendary red-soil farms, our hand-picked Harivanga mangoes arrive tree-ripened, chemical-free, and packed for a premium fresh-fruit experience.",
+};
 
 const loadHomePromotion = (): HomePromotion => {
   if (typeof window === 'undefined') return DEFAULT_HOME_PROMOTION;
@@ -147,6 +157,13 @@ export const Home: React.FC = () => {
   const [promotion, setPromotion] = useState<HomePromotion>(DEFAULT_HOME_PROMOTION);
   const [openPromoStoryIds, setOpenPromoStoryIds] = useState<Record<string, boolean>>({});
   const [activeBannerSlide, setActiveBannerSlide] = useState(0);
+  const [typedHeroLength, setTypedHeroLength] = useState(0);
+
+  const heroSegments = useMemo(
+    () => [HERO_TEXT.lineOne, ' ', HERO_TEXT.highlight, ' ', HERO_TEXT.lineTwo],
+    [],
+  );
+  const heroFullText = useMemo(() => heroSegments.join(''), [heroSegments]);
 
   useEffect(() => {
     const syncPromotion = () => {
@@ -175,6 +192,28 @@ export const Home: React.FC = () => {
     return () => window.clearInterval(intervalId);
   }, []);
 
+  useEffect(() => {
+    const totalLength = heroFullText.length;
+    if (!totalLength) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setTypedHeroLength((current) => (current >= totalLength ? totalLength : current + 1));
+    }, 45);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [typedHeroLength, heroFullText]);
+
+  const typedHeroSegments = useMemo(() => {
+    let remaining = typedHeroLength;
+
+    return heroSegments.map((segment) => {
+      if (remaining <= 0) return '';
+      const value = segment.slice(0, remaining);
+      remaining -= segment.length;
+      return value;
+    });
+  }, [heroSegments, typedHeroLength]);
+
   const promoStories = promotion.promoStories.filter((story) => story.videoUrl.trim());
   const showPromotion = promoStories.length > 0;
 
@@ -186,14 +225,22 @@ export const Home: React.FC = () => {
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:grid-cols-[minmax(0,1.02fr)_minmax(430px,0.98fr)] lg:gap-14 lg:px-8 lg:pb-20 lg:pt-24">
           <div className="max-w-3xl">
             <span className="mb-6 inline-block rounded-full bg-mango-orange px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white sm:text-sm">
-              Season 2026 Is Here
+              {HERO_TEXT.badge}
             </span>
             <h1 className="max-w-4xl text-[3.05rem] font-black leading-[0.92] tracking-tight text-[#8f4b00] sm:text-6xl lg:text-7xl xl:text-[5.2rem]">
-              Farm Fresh <span className="text-mango-orange italic">Mangoes</span> for Every Doorstep
+              {typedHeroSegments[0]}
+              {typedHeroSegments[1]}
+              <span className="text-mango-orange italic">{typedHeroSegments[2]}</span>
+              {typedHeroSegments[3]}
+              {typedHeroSegments[4]}
+              {typedHeroLength < heroFullText.length ? (
+                <span aria-hidden="true" className="ml-1 inline-block animate-pulse text-mango-orange">
+                  |
+                </span>
+              ) : null}
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-[#6f6255] sm:text-lg">
-              Straight from Podaganj&apos;s legendary red-soil farms, our hand-picked Harivanga mangoes arrive tree-ripened,
-              chemical-free, and packed for a premium fresh-fruit experience.
+              {HERO_TEXT.description}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
               <Link

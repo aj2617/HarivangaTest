@@ -9,8 +9,11 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
+    "build:prod": "vite build",
     "preview": "vite preview",
     "start": "node server.js",
+    "start:prod": "NODE_ENV=production node server.js",
+    "prod:prepare": "npm ci && npm run build:prod",
     "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
     "lint": "tsc --noEmit"
   },
